@@ -33,7 +33,7 @@
                     <th>التسمية التجارية / المعصرة</th>
                     <th>طبيعة النشاط</th>
                     <th>الترخيص</th>
-                    <th>الجماعة</th>
+                    <th>الجهة</th>
                     <th>الوضعية (النتيجة)</th>
                 </tr>
             </thead>
@@ -54,10 +54,13 @@
         tbody.innerHTML = `<tr><td colspan="6" class="no-data">جاري التحديث...</td></tr>`;
 
         try {
-            // جلب الطلبات مرتبة من الأحدث إلى الأقدم
+            // جلب الطلبات مع ربط جدول الجهات (regions) لجلب اسم الجهة مباشرة
             const { data, error } = await supabaseClient
                 .from('submissions')
-                .select('*')
+                .select(`
+                    *,
+                    regions (name_ar)
+                `)
                 .order('id', { ascending: false });
 
             if (error) {
@@ -74,28 +77,29 @@
             data.forEach(sub => {
                 const tr = document.createElement('tr');
                 
-                // تنسيق تاريخ بسيط أو إظهار الـ ID إن لم يكن حقل التاريخ موجوداً بصيغة معينة
                 const dateStr = sub.created_at ? new Date(sub.created_at).toLocaleString('ar-MA') : 'مدخل حديث';
                 const badgeClass = sub.result === 'قبول' ? 'badge-success' : 'badge-danger';
+                
+                // استخراج اسم الجهة من العلاقة مع جدول regions
+                const regionName = sub.regions ? sub.regions.name_ar : 'غير محددة';
 
                 tr.innerHTML = `
                     <td>${dateStr}</td>
                     <td><strong>${sub.company_name}</strong></td>
                     <td>${sub.activity_nature}</td>
                     <td>${sub.license_status}</td>
-                    <td>${sub.commune}</td>
+                    <td>${regionName}</td>
                     <td><span class="${badgeClass}">${sub.result}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
 
-        } catch (err) {
+        }CATCH (err) {
             console.error('Error:', err);
             tbody.innerHTML = `<tr><td colspan="6" class="no-data" style="color: red;">حدث خطأ في الاتصال بالشبكة.</td></tr>`;
         }
     }
 
-    // تحميل الطلبات فور فتح الصفحة
     loadSubmissions();
 </script>
 </body>
