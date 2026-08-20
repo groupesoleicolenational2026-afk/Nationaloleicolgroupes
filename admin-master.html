@@ -16,7 +16,7 @@
             margin: 0; 
             background-color: var(--cream);
             background-image: radial-gradient(var(--olive-light) 0.5px, transparent 0.5px);
-            background-size: 30px 30px; /* نمط خفيف يرمز للزيتون */
+            background-size: 30px 30px;
             height: 100vh; 
             display: flex; 
             justify-content: center; 
@@ -29,11 +29,14 @@
             box-shadow: 0 15px 35px rgba(62, 79, 58, 0.2); 
             text-align: center; 
             width: 90%; 
-            max-width: 450px; 
+            max-width: 500px; 
             border: 2px solid var(--olive-light);
         }
-        h1 { color: var(--olive-dark); margin-bottom: 10px; }
-        p { color: #666; }
+        /* تنسيق اللوغو */
+        .logo { width: 180px; margin-bottom: 20px; }
+        
+        h1 { color: var(--olive-dark); margin-bottom: 10px; font-size: 1.2rem; line-height: 1.4; }
+        p { color: #666; margin-bottom: 25px; }
         input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; }
         button { background: var(--olive-dark); color: white; padding: 15px 40px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background: var(--gold); transform: scale(1.05); }
@@ -45,15 +48,16 @@
 <body>
 
 <div class="card" id="loginBox">
-    <div style="font-size: 40px;">🫒</div>
-    <h1>دخول المشرف العام</h1>
-    <p>بوابة إدارة الجمعيات المهنية لقطاع الزيتون</p>
+    <!-- إضافة اللوغو -->
+    <img src="logo.png" alt="شعار المجموعة" class="logo">
+    <h1>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون بالمغرب</h1>
+    <p>بوابة الإشراف العام - لوحات التحكم الجهوية</p>
     <input type="password" id="password" placeholder="كلمة المرور">
     <button onclick="checkPassword()">دخول آمن</button>
 </div>
 
 <div class="card" id="menuBox" style="display: none;">
-    <h1 style="color: var(--olive-dark);">الجهات المهنية</h1>
+    <h1 style="color: var(--olive-dark); font-size: 1.2rem;">اختر الجهة للإدارة</h1>
     <div class="grid" id="menuGrid" style="display: grid;">
         <a href="admin.html" class="btn" style="background: #3e4f3a;">جهة مراكش آسفي</a>
         <a href="admin-beni.html" class="btn" style="background: #5d735a;">جهة بني ملال خنيفرة</a>
