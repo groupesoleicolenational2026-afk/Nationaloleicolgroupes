@@ -32,23 +32,20 @@
             max-width: 500px; 
             border: 2px solid var(--olive-light);
         }
-        /* تنسيق اللوغو */
-        .logo { width: 180px; margin-bottom: 20px; }
-        
+        .logo { width: 150px; margin-bottom: 15px; }
         h1 { color: var(--olive-dark); margin-bottom: 10px; font-size: 1.2rem; line-height: 1.4; }
         p { color: #666; margin-bottom: 25px; }
-        input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; }
+        input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
         button { background: var(--olive-dark); color: white; padding: 15px 40px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background: var(--gold); transform: scale(1.05); }
         .grid { display: none; grid-template-columns: 1fr; gap: 12px; margin-top: 25px; }
-        .btn { color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .btn { color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; display: block; }
         .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
     </style>
 </head>
 <body>
 
 <div class="card" id="loginBox">
-    <!-- إضافة اللوغو -->
     <img src="logo.png" alt="شعار المجموعة" class="logo">
     <h1>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون بالمغرب</h1>
     <p>بوابة الإشراف العام - لوحات التحكم الجهوية</p>
@@ -56,6 +53,8 @@
     <button onclick="checkPassword()">دخول آمن</button>
 </div>
 
+<div class="card" id="menuBox" style="display: none;">
+    <h1 style="color: var(--olive-dark); font-size: 1.2rem;">اختر الجهة للإدارة</h1>
     <div class="grid" id="menuGrid" style="display: grid;">
         <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;">جهة مراكش آسفي</a>
         <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;">جهة بني ملال خنيفرة</a>
@@ -63,13 +62,12 @@
         <a href="admin-cherk.html" class="btn" style="background: #a5b4a3;">جهة الشرق</a>
         <a href="admin-tanger.html" class="btn" style="background: #c5a059;">جهة طنجة تطوان الحسيمة</a>
     </div>
-    
 </div>
 
 <script>
     function checkPassword() {
         const pass = document.getElementById('password').value;
-        if (pass === "RedBadr2026") { 
+        if (pass === "123456") { 
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('menuBox').style.display = 'block';
         } else {
