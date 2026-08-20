@@ -186,30 +186,34 @@
             alert('الرجاء اختيار نوع وحدة واحد على الأقل.');
             return;
         }
-
-        let finalResult = "قبول";
-        let messageHTML = "";
         
-        const isMarketingOnly = selectedUnits.includes("التسويق و التعبئة فقط (لا أملك معصرة)");
-        if (isMarketingOnly && license === 'لا') {
-            finalResult = "رفض";
-            messageHTML = `<div class="danger">
-                <h3>🔴 عذراً، تم رفض الطلب</h3>
-                <p>الشروط غير مستوفاة لعدم توفر الترخيص.</p>
-            </div>`;
-        } else if (isMarketingOnly && license === 'في طور الإنجاز') {
-            finalResult = "رفض";
-            messageHTML = `<div class="danger">
-                <h3>🔴 عذراً، تم رفض الطلب</h3>
-                <p>عند حصولك على الترخيص يمكنك إعادة طلب الانضمام.</p>
-            </div>`;
-        } else {
-            finalResult = "قبول";
-            messageHTML = `<div class="success">
-                <h3>🟢 مبروك، تم قبول طلبك بنجاح!</h3>
-                <p>يمكنك الآن الانضمام مباشرة إلى مجموعة WhatsApp الجهوية:</p>
-                <a href="${whatsappLink}" target="_blank" class="whatsapp-btn">الانضمام إلى مجموعة الواتساب الجهوية</a>
-            </div>`;
+let finalResult = "قبول";
+let messageHTML = "";
+
+// التحقق من طبيعة النشاط (تسويق زيت الزيتون بدون معصرة)
+const isMarketingOnly = selectedUnit.includes("تسويق زيت الزيتون(لا أملك معصرة)");
+
+if (isMarketingOnly && license === "غير حاصل") {
+    finalResult = "تم رفض طلبك";
+    messageHTML = `<div class="danger">
+        <h3>🔴 عذراً، تم رفض طلبك</h3>
+        <p>تم رفض طلبك (لعدم الاستيفاء القانوني للترخيص الصحي).</p>
+    </div>`;
+} else if (isMarketingOnly && license === "في طور الإنجاز") {
+    finalResult = "تم رفض طلبك مؤقتا";
+    messageHTML = `<div class="danger">
+        <h3>🔴 عذراً، تم رفض طلبك مؤقتا</h3>
+        <p>تم رفض طلبك مؤقتا (في انتظار تسوية وضعية الترخيص الصحي).</p>
+    </div>`;
+} else {
+    finalResult = "قبول";
+    messageHTML = `<div class="success">
+        <h3>🟢 مبروك، تم قبول طلبك بنجاح</h3>
+        <p>يمكنك الآن الانضمام مباشرة إلى مجموعة WhatsApp الجهوية عبر الرابط التالي:</p>
+        <a href="${whatsappLink}" target="_blank" class="btn-whatsapp">الانضمام للمجموعة</a>
+    </div>`;
+}
+
         }
 
         await supabaseClient.from('submissions').insert([{
