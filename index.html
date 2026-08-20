@@ -9,12 +9,7 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 700px; background: #fff; margin: auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         h2 { text-align: center; color: #1e3d59; margin-bottom: 10px; }
-        p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
-        
-        .legal-notice { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #059669; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 13.5px; line-height: 1.6; color: #475569; }
-        .legal-notice p { margin: 0 0 10px 0; }
-        .legal-notice p:last-child { margin-bottom: 0; }
-        
+        p.subtitle { text-align: center; color: #666; margin-bottom: 25px; font-size: 14px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
         select, input[type="text"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background-color: #fff; box-sizing: border-box; }
@@ -22,7 +17,7 @@
         .checkbox-group { background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
         .checkbox-label { display: flex; align-items: center; font-weight: normal; margin-bottom: 8px; cursor: pointer; }
         .checkbox-label input { margin-left: 10px; width: 18px; height: 18px; }
-        .declaration-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; display: flex; align-items: center; margin-bottom: 15px; }
+        .declaration-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; display: flex; align-items: center; }
         button { background: #059669; color: white; border: none; cursor: pointer; margin-top: 15px; font-weight: bold; transition: background 0.3s; }
         button:hover { background: #047857; }
         #result-box { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; display: none; }
@@ -37,11 +32,6 @@
     <h2>استمارة التحقق من الصفة المهنية</h2>
     <p class="subtitle">خاص بأرباب المعاصر ومسوقي زيت الزيتون للانضمام للمجموعات الجهوية</p>
     
-    <div class="legal-notice">
-        <p><strong>الغرض من الاستمارة:</strong> تهدف هذه الاستمارة حصريًا إلى التحقق من الصفة المهنية لطالب الانضمام إلى مجموعة الواتساب لمهنيي إنتاج وتسويق زيت الزيتون، والتأكد من ارتباط الوحدة أو النشاط المصرح به فعليًا بالقطاع.</p>
-        <p>🔒 <strong>حماية البيانات:</strong> لا يُطلب في هذه الاستمارة رقم الهاتف، البريد الإلكتروني، رقم البطاقة الوطنية، أو أي معلومات شخصية غير ضرورية. تُستعمل المعلومات المقدمة من طرف مشرفي المجموعة فقط لغرض التحقق والبت في طلب الانضمام.</p>
-    </div>
-
     <form id="verificationForm">
         <!-- 1. الجهة -->
         <div class="form-group">
@@ -59,13 +49,13 @@
             </select>
         </div>
 
-        <!-- 3. الجماعة الترابية -->
+        <!-- 3. الجماعة الترابية (إدخال يدوي) -->
         <div class="form-group">
             <label for="commune">الجماعة الترابية:</label>
             <input type="text" id="commune" placeholder="أدخل اسم الجماعة أو المدشر أو الدوار..." required>
         </div>
 
-        <!-- 4. التسمية التجارية -->
+        <!-- 4. التسمية التجارية أو القانونية للوحدة -->
         <div class="form-group">
             <label for="companyName">التسمية التجارية أو القانونية للوحدة:</label>
             <input type="text" id="companyName" placeholder="أدخل اسم الشركة أو المعصرة أو النشاط..." required>
@@ -77,101 +67,103 @@
             <select id="activityNature" required>
                 <option value="">اختر طبيعة النشاط...</option>
                 <option value="طحن الزيتون">طحن الزيتون</option>
-                <option value="تسويق زيت الزيتون(لا أملك معصرة)">تسويق زيت الزيتون (لا أملك معصرة)</option>
+                <option value="تسويق زيت الزيتون">تسويق زيت الزيتون</option>
                 <option value="الطحن و التسويق">الطحن و التسويق</option>
             </select>
         </div>
 
-        <!-- 6. نوع الوحدة -->
+        <!-- 6. نوع الوحدة (اختيار متعدد) -->
         <div class="form-group">
             <label>نوع الوحدة (يمكن اختيار أكثر من عنصر):</label>
             <div class="checkbox-group">
                 <label class="checkbox-label"><input type="checkbox" name="unitType" value="عصرية"> عصرية</label>
                 <label class="checkbox-label"><input type="checkbox" name="unitType" value="شبه عصرية"> شبه عصرية</label>
                 <label class="checkbox-label"><input type="checkbox" name="unitType" value="تقليدية"> تقليدية</label>
-                <label class="checkbox-label"><input type="checkbox" name="unitType" value="خدمات التعبئة والتسويق"> خدمات التعبئة والتسويق</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="التسويق و التعبئة فقط (لا أملك معصرة)"> التسويق و التعبئة فقط (لا أملك معصرة)</label>
             </div>
         </div>
 
-        <!-- 7. الترخيص الصحي -->
+        <!-- 7. الترخيص / الاعتماد الصحي -->
         <div class="form-group">
-            <label for="license">الوضع القانوني للترخيص الصحي (ONSSA):</label>
+            <label for="license">الترخيص / الاعتماد الصحي:</label>
             <select id="license" required>
-                <option value="">اختر الحالة القانونية...</option>
-                <option value="حاصل">حاصل على الترخيص</option>
+                <option value="">اختر حالة الترخيص...</option>
+                <option value="نعم">نعم</option>
+                <option value="لا">لا</option>
                 <option value="في طور الإنجاز">في طور الإنجاز</option>
-                <option value="غير حاصل">غير حاصل</option>
             </select>
         </div>
 
-        <div class="form-group declaration-box">
-            <label class="checkbox-label" style="margin-bottom: 0; width: 100%;">
-                <input type="checkbox" id="declaration" required style="margin-left: 10px;">
-                أصرح أضواءً بصدق وصحة المعلومات المصرح بها أعلاه تحت مسؤوليتي المهنية.
-            </label>
+        <!-- 8. الإقرار -->
+        <div class="form-group">
+            <div class="declaration-box">
+                <label class="checkbox-label" style="margin: 0; width: 100%;">
+                    <input type="checkbox" id="declaration" required style="margin-left: 10px;">
+                    <span>أقر بصحة المعلومات الإدارية والمهنية المدلى بها في هذه الاستمارة.</span>
+                </label>
+            </div>
         </div>
 
-        <button type="submit">تحقق وتقديم الطلب</button>
+        <button type="submit">إرسال وتحقق</button>
     </form>
 
     <div id="result-box"></div>
 </div>
 
 <script>
-    // بيانات الاتصال بقاعدة بيانات Supabase الخاصة بك
-    const SUPABASE_URL = 'ضع_رابط_supabase_هنا';
-    const SUPABASE_KEY = 'ضع_مفتاح_supabase_هنا';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const regionSelect = document.getElementById('region');
     const provinceSelect = document.getElementById('province');
-    const form = document.getElementById('verificationForm');
+    const communeInput = document.getElementById('commune');
     const resultBox = document.getElementById('result-box');
 
-    // دالة جلب الجهات من Supabase لتعبئة القائمة المنسدلة
     async function loadRegions() {
-        const { data, error } = await supabaseClient.from('regions').select('*');
-        if (!error && data) {
+        try {
+            const { data, error } = await supabaseClient.from('regions').select('*');
+            if (error) { console.error('Supabase Error:', error); return; }
+            if (!data || data.length === 0) return;
+
             data.forEach(region => {
-                const option = document.createElement('option');
+                let option = document.createElement('option');
                 option.value = region.id;
-                option.textContent = region.name;
+                option.textContent = region.name_ar;
                 option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
                 regionSelect.appendChild(option);
             });
+        } catch (err) {
+            console.error('Network error:', err);
         }
     }
 
-    // جلب الأقاليم بناءً على الجهة المختارة
     regionSelect.addEventListener('change', async function() {
         const regionId = this.value;
         provinceSelect.innerHTML = '<option value="">اختر الإقليم / العمالة...</option>';
-        if (!regionId) {
-            provinceSelect.disabled = true;
-            return;
-        }
-
-        const { data, error } = await supabaseClient.from('provinces').select('*').eq('region_id', regionId);
-        if (!error && data) {
+        provinceSelect.disabled = true;
+        
+        if (!regionId) return;
+        
+        const { data } = await supabaseClient.from('provinces').select('*').eq('region_id', regionId);
+        if (data) {
             data.forEach(prov => {
-                const option = document.createElement('option');
+                let option = document.createElement('option');
                 option.value = prov.id;
-                option.textContent = prov.name;
+                option.textContent = prov.name_ar;
                 provinceSelect.appendChild(option);
             });
             provinceSelect.disabled = false;
         }
     });
 
-    // تنفيذ عملية الإرسال وفحص الشروط الآلية
-    form.addEventListener('submit', async function(e) {
+    document.getElementById('verificationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-
+        
         const regionId = regionSelect.value;
         const provinceId = provinceSelect.value;
-        const communeText = document.getElementById('commune').value;
-        const whatsappLink = regionSelect.options[regionSelect.selectedIndex]?.getAttribute('data-whatsapp') || "#";
-        
+        const communeText = communeInput.value;
+        const whatsappLink = regionSelect.options[regionSelect.selectedIndex].getAttribute('data-whatsapp');
         const companyName = document.getElementById('companyName').value;
         const activityNature = document.getElementById('activityNature').value;
         const license = document.getElementById('license').value;
@@ -183,24 +175,22 @@
             alert('الرجاء اختيار نوع وحدة واحد على الأقل.');
             return;
         }
-        
+
         let finalResult = "قبول";
         let messageHTML = "";
-
-        // فحص الشروط الآلية للنشاط والترخيص
-        const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
-
-        if (isMarketingOnly && license === "غير حاصل") {
-            finalResult = "تم رفض طلبك";
+        
+        const isMarketingOnly = selectedUnits.includes("التسويق و التعبئة فقط (لا أملك معصرة)");
+        if (isMarketingOnly && license === 'لا') {
+            finalResult = "رفض";
             messageHTML = `<div class="danger">
-                <h3>🔴 عذراً، تم رفض طلبك</h3>
-                <p>تم رفض طلبك (لعدم الاستيفاء القانوني للترخيص الصحي).</p>
+                <h3>🔴 عذراً، تم رفض الطلب</h3>
+                <p>الشروط غير مستوفاة لعدم توفر الترخيص.</p>
             </div>`;
-        } else if (isMarketingOnly && license === "في طور الإنجاز") {
-            finalResult = "تم رفض طلبك مؤقتا";
+        } else if (isMarketingOnly && license === 'في طور الإنجاز') {
+            finalResult = "رفض";
             messageHTML = `<div class="danger">
-                <h3>🔴 عذراً، تم رفض طلبك مؤقتا</h3>
-                <p>تم رفض طلبك مؤقتا (في انتظار تسوية وضعية الترخيص الصحي).</p>
+                <h3>🔴 عذراً، تم رفض الطلب</h3>
+                <p>عند حصولك على الترخيص يمكنك إعادة طلب الانضمام.</p>
             </div>`;
         } else {
             finalResult = "قبول";
@@ -211,7 +201,7 @@
             </div>`;
         }
 
-        const { error } = await supabaseClient.from('submissions').insert([{
+        await supabaseClient.from('submissions').insert([{
             region_id: regionId,
             province_id: provinceId,
             commune: communeText,
@@ -223,20 +213,13 @@
             result: finalResult
         }]);
 
-        if (error) {
-            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة.");
-            console.error(error);
-            return;
-        }
-
-        form.style.display = 'none';
         resultBox.style.display = 'block';
         resultBox.innerHTML = messageHTML;
         resultBox.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // تحميل الجهات عند فتح الصفحة
     loadRegions();
 </script>
 </body>
-</html>
+    </html>
+    
