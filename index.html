@@ -9,7 +9,13 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 700px; background: #fff; margin: auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         h2 { text-align: center; color: #1e3d59; margin-bottom: 10px; }
-        p.subtitle { text-align: center; color: #666; margin-bottom: 25px; font-size: 14px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+        
+        /* تنسيق صندوق المقدمة القانونية */
+        .legal-notice { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #059669; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 13.5px; line-height: 1.6; color: #475569; }
+        .legal-notice p { margin: 0 0 10px 0; }
+        .legal-notice p:last-child { margin-bottom: 0; }
+        
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
         select, input[type="text"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background-color: #fff; box-sizing: border-box; }
@@ -32,6 +38,12 @@
     <h2>استمارة التحقق من الصفة المهنية</h2>
     <p class="subtitle">خاص بأرباب المعاصر ومسوقي زيت الزيتون للانضمام للمجموعات الجهوية</p>
     
+    <!-- المقدمة القانونية والإشعار -->
+    <div class="legal-notice">
+        <p><strong>الغرض من الاستمارة:</strong> تهدف هذه الاستمارة حصريًا إلى التحقق من الصفة المهنية لطالب الانضمام إلى مجموعة الواتساب لمهنيي إنتاج وتسويق زيت الزيتون، والتأكد من ارتباط الوحدة أو النشاط المصرح به فعليًا بالقطاع.</p>
+        <p>🔒 <strong>حماية البيانات:</strong> لا يُطلب في هذه الاستمارة رقم الهاتف، البريد الإلكتروني، رقم البطاقة الوطنية، أو أي معلومات شخصية غير ضرورية. تُستعمل المعلومات المقدمة من طرف مشرفي المجموعة فقط لغرض التحقق والبت في طلب الانضمام.</p>
+    </div>
+
     <form id="verificationForm">
         <!-- 1. الجهة -->
         <div class="form-group">
