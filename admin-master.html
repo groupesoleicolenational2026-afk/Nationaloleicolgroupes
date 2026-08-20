@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوابة الإشراف العام | قطاع الزيتون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --olive-dark: #3e4f3a; 
+            --olive-light: #7a8b75; 
+            --gold: #c5a059; 
+            --cream: #f9f7f2; 
+        }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            background-color: var(--cream);
+            background-image: radial-gradient(var(--olive-light) 0.5px, transparent 0.5px);
+            background-size: 30px 30px; /* نمط خفيف يرمز للزيتون */
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 40px; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(62, 79, 58, 0.2); 
+            text-align: center; 
+            width: 90%; 
+            max-width: 450px; 
+            border: 2px solid var(--olive-light);
+        }
+        h1 { color: var(--olive-dark); margin-bottom: 10px; }
+        p { color: #666; }
+        input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; }
+        button { background: var(--olive-dark); color: white; padding: 15px 40px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: var(--gold); transform: scale(1.05); }
+        .grid { display: none; grid-template-columns: 1fr; gap: 12px; margin-top: 25px; }
+        .btn { color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+    </style>
+</head>
+<body>
+
+<div class="card" id="loginBox">
+    <div style="font-size: 40px;">🫒</div>
+    <h1>دخول المشرف العام</h1>
+    <p>بوابة إدارة الجمعيات المهنية لقطاع الزيتون</p>
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <button onclick="checkPassword()">دخول آمن</button>
+</div>
+
+<div class="card" id="menuBox" style="display: none;">
+    <h1 style="color: var(--olive-dark);">الجهات المهنية</h1>
+    <div class="grid" id="menuGrid" style="display: grid;">
+        <a href="admin.html" class="btn" style="background: #3e4f3a;">جهة مراكش آسفي</a>
+        <a href="admin-beni.html" class="btn" style="background: #5d735a;">جهة بني ملال خنيفرة</a>
+        <a href="admin-fes.html" class="btn" style="background: #7a8b75;">جهة فاس مكناس</a>
+        <a href="admin-oriental.html" class="btn" style="background: #a5b4a3;">جهة الشرق</a>
+        <a href="admin-tanger.html" class="btn" style="background: #c5a059;">جهة طنجة تطوان الحسيمة</a>
+    </div>
+</div>
+
+<script>
+    function checkPassword() {
+        const pass = document.getElementById('password').value;
+        if (pass === "123456") { 
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('menuBox').style.display = 'block';
+        } else {
+            alert("كلمة المرور خاطئة، يرجى المحاولة مجدداً.");
+        }
+    }
+</script>
+</body>
+</html>
