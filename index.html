@@ -49,12 +49,10 @@
             </select>
         </div>
 
-        <!-- 3. الجماعة الترابية -->
+        <!-- 3. الجماعة الترابية (إدخال يدوي) -->
         <div class="form-group">
             <label for="commune">الجماعة الترابية:</label>
-            <select id="commune" disabled required>
-                <option value="">اختر الإقليم أولاً...</option>
-            </select>
+            <input type="text" id="commune" placeholder="أدخل اسم الجماعة أو المدشر أو الدوار..." required>
         </div>
 
         <!-- 4. التسمية التجارية أو القانونية للوحدة -->
@@ -113,36 +111,39 @@
 </div>
 
 <script>
-    // تم تصحيح الرابط بإزالة النقطة الزائدة في البداية
     const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const regionSelect = document.getElementById('region');
     const provinceSelect = document.getElementById('province');
-    const communeSelect = document.getElementById('commune');
+    const communeInput = document.getElementById('commune');
     const resultBox = document.getElementById('result-box');
 
     async function loadRegions() {
-        const { data, error } = await supabaseClient.from('regions').select('*');
-        if (error) { console.error('Error loading regions:', error); return; }
-        
-        data.forEach(region => {
-            let option = document.createElement('option');
-            option.value = region.id;
-            option.textContent = region.name_ar;
-            option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
-            regionSelect.appendChild(option);
-        });
+        try {
+            const { data, error } = await supabaseClient.from('regions').select('*');
+            if (error) { console.error('Supabase Error:', error); return; }
+            if (!data || data.length === 0) return;
+
+            data.forEach(region => {
+                let option = document.createElement('option');
+                option.value = region.id;
+                option.textContent = region.name_ar;
+                option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
+                regionSelect.appendChild(option);
+            });
+        } catch (err) {
+            console.error('Network error:', err);
+        }
     }
 
     regionSelect.addEventListener('change', async function() {
         const regionId = this.value;
         provinceSelect.innerHTML = '<option value="">اختر الإقليم / العمالة...</option>';
-        communeSelect.innerHTML = '<option value="">اختر الإقليم أولاً...</option>';
-        communeSelect.disabled = true;
+        provinceSelect.disabled = true;
         
-        if (!regionId) { provinceSelect.disabled = true; return; }
+        if (!regionId) return;
         
         const { data } = await supabaseClient.from('provinces').select('*').eq('region_id', regionId);
         if (data) {
@@ -156,35 +157,18 @@
         }
     });
 
-    provinceSelect.addEventListener('change', async function() {
-        const provinceId = this.value;
-        communeSelect.innerHTML = '<option value="">اختر الجماعة الترابية...</option>';
-        
-        if (!provinceId) { communeSelect.disabled = true; return; }
-        
-        const { data } = await supabaseClient.from('communes').select('*').eq('province_id', provinceId);
-        if (data) {
-            data.forEach(com => {
-                let option = document.createElement('option');
-                option.value = com.id;
-                option.textContent = com.name_ar;
-                communeSelect.appendChild(option);
-            });
-            communeSelect.disabled = false;
-        }
-    });
-
     document.getElementById('verificationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const regionId = regionSelect.value;
+        const provinceId = provinceSelect.value;
+        const communeText = communeInput.value;
         const whatsappLink = regionSelect.options[regionSelect.selectedIndex].getAttribute('data-whatsapp');
         const companyName = document.getElementById('companyName').value;
         const activityNature = document.getElementById('activityNature').value;
         const license = document.getElementById('license').value;
         const declaration = document.getElementById('declaration').checked;
         
-        // جمع الاختيارات المتعددة لأنواع الوحدات
         const selectedUnits = Array.from(document.querySelectorAll('input[name="unitType"]:checked')).map(el => el.value);
         
         if (selectedUnits.length === 0) {
@@ -195,7 +179,6 @@
         let finalResult = "قبول";
         let messageHTML = "";
         
-        // تطبيق قاعدة الفلترة بدقة:
         const isMarketingOnly = selectedUnits.includes("التسويق و التعبئة فقط (لا أملك معصرة)");
         if (isMarketingOnly && license === 'لا') {
             finalResult = "رفض";
@@ -218,11 +201,10 @@
             </div>`;
         }
 
-        // حفظ البيانات في Supabase
-        const { error: insertError } = await supabaseClient.from('submissions').insert([{
+        await supabaseClient.from('submissions').insert([{
             region_id: regionId,
-            province_id: provinceSelect.value,
-            commune_id: communeSelect.value,
+            province_id: provinceId,
+            commune: communeText,
             company_name: companyName,
             activity_nature: activityNature,
             unit_types: selectedUnits,
@@ -230,10 +212,6 @@
             declaration: declaration,
             result: finalResult
         }]);
-
-        if (insertError) {
-            console.error('Error saving submission:', insertError);
-        }
 
         resultBox.style.display = 'block';
         resultBox.innerHTML = messageHTML;
@@ -244,4 +222,3 @@
 </script>
 </body>
 </html>
-
