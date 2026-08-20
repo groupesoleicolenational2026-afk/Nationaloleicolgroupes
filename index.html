@@ -43,6 +43,7 @@
     </div>
 
     <form id="verificationForm">
+        <!-- 1. الجهة -->
         <div class="form-group">
             <label for="region">الجهة الترابية:</label>
             <select id="region" required>
@@ -50,6 +51,7 @@
             </select>
         </div>
 
+        <!-- 2. الإقليم / العمالة -->
         <div class="form-group">
             <label for="province">الإقليم / العمالة:</label>
             <select id="province" disabled required>
@@ -57,16 +59,19 @@
             </select>
         </div>
 
+        <!-- 3. الجماعة الترابية -->
         <div class="form-group">
             <label for="commune">الجماعة الترابية:</label>
             <input type="text" id="commune" placeholder="أدخل اسم الجماعة أو المدشر أو الدوار..." required>
         </div>
 
+        <!-- 4. التسمية التجارية -->
         <div class="form-group">
             <label for="companyName">التسمية التجارية أو القانونية للوحدة:</label>
             <input type="text" id="companyName" placeholder="أدخل اسم الشركة أو المعصرة أو النشاط..." required>
         </div>
 
+        <!-- 5. طبيعة النشاط -->
         <div class="form-group">
             <label for="activityNature">طبيعة النشاط:</label>
             <select id="activityNature" required>
@@ -77,6 +82,7 @@
             </select>
         </div>
 
+        <!-- 6. نوع الوحدة -->
         <div class="form-group">
             <label>نوع الوحدة (يمكن اختيار أكثر من عنصر):</label>
             <div class="checkbox-group">
@@ -87,6 +93,7 @@
             </div>
         </div>
 
+        <!-- 7. الترخيص الصحي -->
         <div class="form-group">
             <label for="license">الوضع القانوني للترخيص الصحي (ONSSA):</label>
             <select id="license" required>
@@ -111,24 +118,58 @@
 </div>
 
 <script>
+    // بيانات الاتصال بقاعدة بيانات Supabase الخاصة بك
     const SUPABASE_URL = 'ضع_رابط_supabase_هنا';
     const SUPABASE_KEY = 'ضع_مفتاح_supabase_هنا';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // [ملاحظة]: ضع هنا كود جلب الجهات والأقاليم الخاص بك كما كان في نسختك الأصلية
-
+    const regionSelect = document.getElementById('region');
+    const provinceSelect = document.getElementById('province');
     const form = document.getElementById('verificationForm');
     const resultBox = document.getElementById('result-box');
 
+    // دالة جلب الجهات من Supabase لتعبئة القائمة المنسدلة
+    async function loadRegions() {
+        const { data, error } = await supabaseClient.from('regions').select('*');
+        if (!error && data) {
+            data.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region.id;
+                option.textContent = region.name;
+                option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
+                regionSelect.appendChild(option);
+            });
+        }
+    }
+
+    // جلب الأقاليم بناءً على الجهة المختارة
+    regionSelect.addEventListener('change', async function() {
+        const regionId = this.value;
+        provinceSelect.innerHTML = '<option value="">اختر الإقليم / العمالة...</option>';
+        if (!regionId) {
+            provinceSelect.disabled = true;
+            return;
+        }
+
+        const { data, error } = await supabaseClient.from('provinces').select('*').eq('region_id', regionId);
+        if (!error && data) {
+            data.forEach(prov => {
+                const option = document.createElement('option');
+                option.value = prov.id;
+                option.textContent = prov.name;
+                provinceSelect.appendChild(option);
+            });
+            provinceSelect.disabled = false;
+        }
+    });
+
+    // تنفيذ عملية الإرسال وفحص الشروط الآلية
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const regionId = document.getElementById('region').value;
-        const provinceId = document.getElementById('province').value;
+        const regionId = regionSelect.value;
+        const provinceId = provinceSelect.value;
         const communeText = document.getElementById('commune').value;
-        
-        // جلب رابط الواتساب المرتبط بالجهة المختارة
-        const regionSelect = document.getElementById('region');
         const whatsappLink = regionSelect.options[regionSelect.selectedIndex]?.getAttribute('data-whatsapp') || "#";
         
         const companyName = document.getElementById('companyName').value;
@@ -146,7 +187,7 @@
         let finalResult = "قبول";
         let messageHTML = "";
 
-        // فحص ما إذا كان النشاط هو التسويق بدون معصرة مع شروط الترخيص
+        // فحص الشروط الآلية للنشاط والترخيص
         const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
 
         if (isMarketingOnly && license === "غير حاصل") {
@@ -193,7 +234,9 @@
         resultBox.innerHTML = messageHTML;
         resultBox.scrollIntoView({ behavior: 'smooth' });
     });
+
+    // تحميل الجهات عند فتح الصفحة
+    loadRegions();
 </script>
 </body>
-        </html>
-        
+</html>
