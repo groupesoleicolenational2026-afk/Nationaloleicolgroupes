@@ -3,110 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون بالمغرب - استمارة الانخراط</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>استمارة التحقق من الصفة المهنية - قطاع زيت الزيتون</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --olive-dark: #3e4f3a; 
-            --olive-light: #7a8b75; 
-            --gold: #c5a059; 
-            --cream: #f9f7f2; 
-        }
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background-color: var(--cream); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-        }
-        .container { 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(62, 79, 58, 0.15); 
-            width: 100%; 
-            max-width: 600px; 
-            border: 2px solid var(--olive-light);
-        }
-        h2 { color: var(--olive-dark); text-align: center; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--olive-dark); font-weight: bold; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        button { background: var(--olive-dark); color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        button:hover { background: var(--gold); }
-        .success { background: #dcfce7; color: #166534; padding: 15px; border-radius: 10px; text-align: center; margin-top: 20px; }
-        .danger { background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 10px; text-align: center; margin-top: 20px; }
-        .whatsapp-btn { display: inline-block; background: #25d366; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; background: #fff; margin: auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #1e3d59; margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+        
+        .legal-notice { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #059669; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 13.5px; line-height: 1.6; color: #475569; }
+        .legal-notice p { margin: 0 0 10px 0; }
+        .legal-notice p:last-child { margin-bottom: 0; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
+        select, input[type="text"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background-color: #fff; box-sizing: border-box; }
+        select:focus, input[type="text"]:focus { border-color: #3b82f6; outline: none; }
+        .checkbox-group { background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .checkbox-label { display: flex; align-items: center; font-weight: normal; margin-bottom: 8px; cursor: pointer; }
+        .checkbox-label input { margin-left: 10px; width: 18px; height: 18px; }
+        .declaration-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; display: flex; align-items: center; margin-bottom: 15px; }
+        button { background: #059669; color: white; border: none; cursor: pointer; margin-top: 15px; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #047857; }
+        #result-box { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; display: none; }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .whatsapp-btn { display: inline-block; margin-top: 15px; background: #25d366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
+        .whatsapp-btn:hover { background: #20ba5a; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>استمارة الانخراط المهني</h2>
-    <form id="enrollmentForm" onsubmit="submitForm(event)">
-        <div class="form-group">
-            <label>اسم الوحدة / الشركة:</label>
-            <input type="text" id="companyName" required placeholder="أدخل اسم الوحدة">
-        </div>
+    <h2>استمارة التحقق من الصفة المهنية</h2>
+    <p class="subtitle">خاص بأرباب المعاصر ومسوقي زيت الزيتون للانضمام للمجموعات الجهوية</p>
+    
+    <div class="legal-notice">
+        <p><strong>الغرض من الاستمارة:</strong> تهدف هذه الاستمارة حصريًا إلى التحقق من الصفة المهنية لطالب الانضمام إلى مجموعة الواتساب لمهنيي إنتاج وتسويق زيت الزيتون، والتأكد من ارتباط الوحدة أو النشاط المصرح به فعليًا بالقطاع.</p>
+        <p>🔒 <strong>حماية البيانات:</strong> لا يُطلب في هذه الاستمارة رقم الهاتف، البريد الإلكتروني، رقم البطاقة الوطنية، أو أي معلومات شخصية غير ضرورية. تُستعمل المعلومات المقدمة من طرف مشرفي المجموعة فقط لغرض التحقق والبت في طلب الانضمام.</p>
+    </div>
 
+    <form id="verificationForm">
         <div class="form-group">
-            <label>طبيعة النشاط / نوع الوحدة:</label>
-            <select id="selectedUnits" required>
-                <option value="">-- اختر طبيعة النشاط --</option>
-                <option value="معصرة عصرية">معصرة عصرية</option>
-                <option value="معصرة تقليدية">معصرة تقليدية</option>
-                <option value="تسويق زيت الزيتون(لا أملك معصرة)">تسويق زيت الزيتون(لا أملك معصرة)</option>
+            <label for="region">الجهة الترابية:</label>
+            <select id="region" required>
+                <option value="">اختر الجهة...</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>الوضع القانوني للترخيص الصحي (ONSSA):</label>
+            <label for="province">الإقليم / العمالة:</label>
+            <select id="province" disabled required>
+                <option value="">اختر الجهة أولاً...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="commune">الجماعة الترابية:</label>
+            <input type="text" id="commune" placeholder="أدخل اسم الجماعة أو المدشر أو الدوار..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="companyName">التسمية التجارية أو القانونية للوحدة:</label>
+            <input type="text" id="companyName" placeholder="أدخل اسم الشركة أو المعصرة أو النشاط..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="activityNature">طبيعة النشاط:</label>
+            <select id="activityNature" required>
+                <option value="">اختر طبيعة النشاط...</option>
+                <option value="طحن الزيتون">طحن الزيتون</option>
+                <option value="تسويق زيت الزيتون(لا أملك معصرة)">تسويق زيت الزيتون (لا أملك معصرة)</option>
+                <option value="الطحن و التسويق">الطحن و التسويق</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>نوع الوحدة (يمكن اختيار أكثر من عنصر):</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="عصرية"> عصرية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="شبه عصرية"> شبه عصرية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="تقليدية"> تقليدية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="خدمات التعبئة والتسويق"> خدمات التعبئة والتسويق</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="license">الوضع القانوني للترخيص الصحي (ONSSA):</label>
             <select id="license" required>
-                <option value="">-- اختر الحالة --</option>
+                <option value="">اختر الحالة القانونية...</option>
                 <option value="حاصل">حاصل على الترخيص</option>
                 <option value="في طور الإنجاز">في طور الإنجاز</option>
                 <option value="غير حاصل">غير حاصل</option>
             </select>
         </div>
 
-        <!-- أضف باقي الحقول كالجهة والإقليم حسب تصميمك القديم -->
-        
-        <button type="submit">إرسال الطلب</button>
+        <div class="form-group declaration-box">
+            <label class="checkbox-label" style="margin-bottom: 0; width: 100%;">
+                <input type="checkbox" id="declaration" required style="margin-left: 10px;">
+                أصرح أضواءً بصدق وصحة المعلومات المصرح بها أعلاه تحت مسؤوليتي المهنية.
+            </label>
+        </div>
+
+        <button type="submit">تحقق وتقديم الطلب</button>
     </form>
 
-    <div id="resultMessage"></div>
+    <div id="result-box"></div>
 </div>
 
 <script>
-    // إعدادات اتصال Supabase (تأكد من وضع رابطك ومفتاحك الصحيحين)
-    const supabaseClient = supabase.createClient('URL', 'KEY');
-    const regionId = 1; // قم بتعديله حسب الجهة أو جذبه من الاستمارة
+    const SUPABASE_URL = 'ضع_رابط_supabase_هنا';
+    const SUPABASE_KEY = 'ضع_مفتاح_supabase_هنا';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function submitForm(event) {
-        event.preventDefault();
+    // [ملاحظة]: ضع هنا كود جلب الجهات والأقاليم الخاص بك كما كان في نسختك الأصلية
 
+    const form = document.getElementById('verificationForm');
+    const resultBox = document.getElementById('result-box');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const regionId = document.getElementById('region').value;
+        const provinceId = document.getElementById('province').value;
+        const communeText = document.getElementById('commune').value;
+        
+        // جلب رابط الواتساب المرتبط بالجهة المختارة
+        const regionSelect = document.getElementById('region');
+        const whatsappLink = regionSelect.options[regionSelect.selectedIndex]?.getAttribute('data-whatsapp') || "#";
+        
         const companyName = document.getElementById('companyName').value;
-        const selectedUnits = document.getElementById('selectedUnits').value;
+        const activityNature = document.getElementById('activityNature').value;
         const license = document.getElementById('license').value;
-        const whatsappLink = "https://chat.whatsapp.com/your-group-link"; // رابط الواتساب الجهوي
-
+        const declaration = document.getElementById('declaration').checked;
+        
+        const selectedUnits = Array.from(document.querySelectorAll('input[name="unitType"]:checked')).map(el => el.value);
+        
+        if (selectedUnits.length === 0) {
+            alert('الرجاء اختيار نوع وحدة واحد على الأقل.');
+            return;
+        }
+        
         let finalResult = "قبول";
         let messageHTML = "";
-        
-        // التحقق الآلي بناءً على الشروط الجديدة
-        const isMarketingOnly = (selectedUnits === "تسويق زيت الزيتون(لا أملك معصرة)");
-        
-        if (isMarketingOnly && license === 'غير حاصل') {
+
+        // فحص ما إذا كان النشاط هو التسويق بدون معصرة مع شروط الترخيص
+        const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
+
+        if (isMarketingOnly && license === "غير حاصل") {
             finalResult = "تم رفض طلبك";
             messageHTML = `<div class="danger">
                 <h3>🔴 عذراً، تم رفض طلبك</h3>
                 <p>تم رفض طلبك (لعدم الاستيفاء القانوني للترخيص الصحي).</p>
             </div>`;
-        } else if (isMarketingOnly && license === 'في طور الإنجاز') {
+        } else if (isMarketingOnly && license === "في طور الإنجاز") {
             finalResult = "تم رفض طلبك مؤقتا";
             messageHTML = `<div class="danger">
                 <h3>🔴 عذراً، تم رفض طلبك مؤقتا</h3>
@@ -121,28 +170,30 @@
             </div>`;
         }
 
-        // إرسال البيانات إلى جدول Supabase
-        const { error } = await supabaseClient
-            .from('submissions')
-            .insert([
-                { 
-                    company_name: companyName,
-                    activity_nature: selectedUnits,
-                    license_status: license,
-                    result: finalResult,
-                    region_id: regionId
-                }
-            ]);
+        const { error } = await supabaseClient.from('submissions').insert([{
+            region_id: regionId,
+            province_id: provinceId,
+            commune: communeText,
+            company_name: companyName,
+            activity_nature: activityNature,
+            unit_types: selectedUnits,
+            license_status: license,
+            declaration: declaration,
+            result: finalResult
+        }]);
 
         if (error) {
-            alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مجدداً.");
+            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة.");
             console.error(error);
-        } else {
-            // إخفاء النموذج وإظهار النتيجة للمستخدم
-            document.getElementById('enrollmentForm').style.display = 'none';
-            document.getElementById('resultMessage').innerHTML = messageHTML;
+            return;
         }
-    }
+
+        form.style.display = 'none';
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = messageHTML;
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    });
 </script>
 </body>
-</html>
+        </html>
+        
