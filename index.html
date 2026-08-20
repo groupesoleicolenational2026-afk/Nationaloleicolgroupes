@@ -91,9 +91,9 @@
             <label for="license">الوضع القانوني للترخيص الصحي (ONSSA):</label>
             <select id="license" required>
                 <option value="">اختر الحالة القانونية...</option>
-                <option value="حاصل">حاصل على الترخيص</option>
+                <option value="حاصل">نعم</option>
                 <option value="في طور الإنجاز">في طور الإنجاز</option>
-                <option value="غير حاصل">غير حاصل</option>
+                <option value="غير حاصل">لا</option>
             </select>
         </div>
 
@@ -204,7 +204,7 @@
 
         const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
 
-        if (isMarketingOnly && license === "غير حاصل") {
+        if (isMarketingOnly && license === "لا") {
             finalResult = "تم رفض طلبك";
             messageHTML = `<div class="danger">
                 <h3>🔴 عذراً، تم رفض طلبك</h3>
