@@ -115,7 +115,63 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // [ملاحظة]: ضع هنا كود جلب الجهات والأقاليم الخاص بك كما كان في نسختك الأصلية
+    // دالة جلب الجهات وملء القائمة المنسدلة
+    async function loadRegions() {
+        const regionSelect = document.getElementById('region');
+        
+        const { data: regions, error } = await supabaseClient
+            .from('regions')
+            .select('*')
+            .order('id');
+
+        if (error) {
+            console.error('خطأ في جلب الجهات:', error);
+            return;
+        }
+
+        regions.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.id;
+            option.textContent = region.name_ar;
+            // يمكنك ربط رابط الواتساب هنا إذا أردت تخصيصه لكل جهة لاحقاً
+            regionSelect.appendChild(option);
+        });
+    }
+
+    // دالة جلب الأقاليم بناءً على الجهة المختارة
+    document.getElementById('region').addEventListener('change', async function() {
+        const regionId = this.value;
+        const provinceSelect = document.getElementById('province');
+        
+        provinceSelect.innerHTML = '<option value="">اختر الإقليم / العمالة...</option>';
+        
+        if (!regionId) {
+            provinceSelect.disabled = true;
+            provinceSelect.innerHTML = '<option value="">اختر الجهة أولاً...</option>';
+            return;
+        }
+
+        const { data: provinces, error } = await supabaseClient
+            .from('provinces')
+            .select('*')
+            .eq('region_id', regionId);
+
+        if (error) {
+            console.error('خطأ في جلب الأقاليم:', error);
+            return;
+        }
+
+        provinceSelect.disabled = false;
+        provinces.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province.id;
+            option.textContent = province.name_ar;
+            provinceSelect.appendChild(option);
+        });
+    });
+
+    // استدعاء دالة تحميل الجهات عند فتح الصفحة
+    loadRegions();
 
     const form = document.getElementById('verificationForm');
     const resultBox = document.getElementById('result-box');
@@ -127,9 +183,9 @@
         const provinceId = document.getElementById('province').value;
         const communeText = document.getElementById('commune').value;
         
-        // جلب رابط الواتساب المرتبط بالجهة المختارة
+        // جلب رابط الواتساب المرتبط بالجهة المختارة (افتراضي أو مخصص)
         const regionSelect = document.getElementById('region');
-        const whatsappLink = regionSelect.options[regionSelect.selectedIndex]?.getAttribute('data-whatsapp') || "#";
+        const whatsappLink = "#"; // يمكنك تعديل رابط الواتساب حسب الحاجة
         
         const companyName = document.getElementById('companyName').value;
         const activityNature = document.getElementById('activityNature').value;
@@ -146,7 +202,6 @@
         let finalResult = "قبول";
         let messageHTML = "";
 
-        // فحص ما إذا كان النشاط هو التسويق بدون معصرة مع شروط الترخيص
         const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
 
         if (isMarketingOnly && license === "غير حاصل") {
@@ -194,5 +249,6 @@
         resultBox.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
+    
 </body>
 </html>
