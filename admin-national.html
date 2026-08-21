@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة الإشراف الوطني الشامل | قطاع زيت الزيتون</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 1300px; margin: auto; }
+        .header-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #1e293b; color: white; padding: 15px; text-align: right; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; }
+        .export-btn { background: #059669; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.3s; }
+        .export-btn:hover { background: #047857; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-danger { background: #fee2e2; color: #991b1b; }
+        .filter-box { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        select { padding: 10px 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Cairo', sans-serif; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <div>
+            <h1 style="color: #1e293b; margin: 0 0 5px 0;">🌐 لوحة الإشراف الوطني الشامل</h1>
+            <p style="color: #666; margin: 0;">متابعة الجداول الجهوية والوطنية وتصدير البيانات للمشرف العام حصرياً</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="export-btn" onclick="exportCurrentViewCSV()">📥 تنزيل الجدول المعروض حالياً</button>
+            <button class="export-btn" style="background: #1e3d59;" onclick="exportNationalCSV()">📥 تنزيل كل الجهات (وطني)</button>
+        </div>
+    </div>
+
+    <!-- لوحة التصفية والتحكم -->
+    <div class="card">
+        <div class="filter-box">
+            <label style="font-weight: bold; font-size: 16px;">اختر الجهة للعرض والتنزيل:</label>
+            <select id="regionFilter" onchange="filterNationalData()">
+                <option value="all">🌐 جميع الجهات (الجدول الوطني العام)</option>
+                <option value="1">جهة مراكش آسفي</option>
+                <option value="2">جهة بني ملال خنيفرة</option>
+                <option value="3">جهة فاس مكناس</option>
+                <option value="4">جهة الشرق</option>
+                <option value="5">جهة طنجة تطوان الحسيمة</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>تاريخ الإنضمام</th>
+                    <th>الجهة</th>
+                    <th>الإقليم / الجماعة</th>
+                    <th>التسمية التجارية</th>
+                    <th>طبيعة النشاط</th>
+                    <th>الترخيص الصحي</th>
+                    <th>الوضعية</th>
+                </tr>
+            </thead>
+            <tbody id="nationalTableBody">
+                <tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allNationalData = [];
+    let currentFilteredData = [];
+
+    async function fetchNationalData() {
+        const { data, error } = await supabaseClient
+            .from('submissions')
+            .select(`
+                *,
+                regions (id, name_ar),
+                provinces (name_ar)
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('خطأ في جلب البيانات:', error);
+            return;
+        }
+
+        allNationalData = data;
+        currentFilteredData = data; // افتراضياً الكل معروض
+        renderNationalTable(data);
+    }
+
+    function renderNationalTable(data) {
+        const tbody = document.getElementById('nationalTableBody');
+        
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.map(d => `
+            <tr>
+                <td>${new Date(d.created_at).toLocaleDateString('ar-MA')}</td>
+                <td><strong>${d.regions?.name_ar || '-'}</strong></td>
+                <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
+                <td>${d.company_name || '-'}</td>
+                <td>${d.activity_nature || '-'}</td>
+                <td>${d.license_status || '-'}</td>
+                <td><span class="badge ${d.result && d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result || '-'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // تصفية الجدول حسب الجهة المختارة
+    function filterNationalData() {
+        const selectedVal = document.getElementById('regionFilter').value;
+        if (selectedVal === 'all') {
+            currentFilteredData = allNationalData;
+        } else {
+            currentFilteredData = allNationalData.filter(d => String(d.region_id) === selectedVal);
+        }
+        renderNationalTable(currentFilteredData);
+    }
+
+    // دالة عامة لتصدير أي مجموعة بيانات إلى ملف CSV
+    function downloadCSV(dataToExport, filename) {
+        if (!dataToExport || dataToExport.length === 0) {
+            alert('لا توجد بيانات لتنزيلها في هذا الجدول.');
+            return;
+        }
+
+        let csv = '\uFEFFتاريخ الإنضمام,الجهة,الإقليم,الجماعة,التسمية التجارية,طبيعة النشاط,الترخيص الصحي,الوضعية\n';
+
+        dataToExport.forEach(d => {
+            const date = new Date(d.created_at).toLocaleDateString('ar-MA');
+            const region = d.regions?.name_ar || '';
+            const province = d.provinces?.name_ar || '';
+            const commune = d.commune || '';
+            const company = d.company_name || '';
+            const activity = d.activity_nature || '';
+            const license = d.license_status || '';
+            const result = d.result || '';
+
+            csv += `"${date}","${region}","${province}","${commune}","${company}","${activity}","${license}","${result}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // تنزيل الجدول المعروض حالياً (سواء جهة واحدة محددة أو الكل)
+    function exportCurrentViewCSV() {
+        const selectElement = document.getElementById('regionFilter');
+        const selectedText = selectElement.options[selectElement.selectedIndex].text.replace(/[^\w\sarabic]/gi, '').trim();
+        downloadCSV(currentFilteredData, `Report_${selectedText}_${new Date().toISOString().slice(0,10)}.csv`);
+    }
+
+    // تنزيل التقرير الوطني الشامل بغض النظر عن الفلتر
+    function exportNationalCSV() {
+        downloadCSV(allNationalData, `National_Olive_Report_All_Regions_${new Date().toISOString().slice(0,10)}.csv`);
+    }
+
+    fetchNationalData();
+
+    // التحديث الفوري للبيانات
+    supabaseClient
+        .channel('public:national-submissions')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, payload => {
+            fetchNationalData();
+        })
+        .subscribe();
+</script>
+</body>
+</html>
