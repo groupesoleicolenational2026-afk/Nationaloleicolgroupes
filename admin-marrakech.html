@@ -105,33 +105,29 @@
 
     // دالة طلب حذف السجل وإرساله مباشرة لقاعدة بيانات المشرف العام
     async function requestDelete(recordId, companyName) {
-        const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام في لوحته:`);
-        
-        if (!reason || reason.trim() === "") {
-            alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
-            return;
-        }
-
-        const currentRegionName = regionNameMap[regionId] || "جهة غير محددة";
-
-        const { error } = await supabaseClient
-            .from('delete_requests')
-            .insert([
-                { 
-                    submission_id: recordId, 
-                    company_name: companyName, 
-                    region_name: currentRegionName, 
-                    reason: reason.trim() 
-                }
-            ]);
-
-        if (error) {
-            alert('حدث خطأ أثناء إرسال طلب الحذف إلى المشرف العام.');
-            console.error(error);
-        } else {
-            alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام في انتظار قراره النهائي. ✅');
-        }
+    const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام:`);
+    
+    if (!reason || reason.trim() === "") {
+        alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
+        return;
     }
+
+    const { error } = await supabaseClient
+        .from('submissions')
+        .update({ 
+            deletion_requested: true, 
+            deletion_reason: reason.trim() 
+        })
+        .eq('id', recordId);
+
+    if (error) {
+        alert('حدث خطأ أثناء إرسال طلب الحذف.');
+        console.error(error);
+    } else {
+        alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام. ✅');
+    }
+    }
+    
 
     function renderCharts(data) {
         const provinceCounts = {};
