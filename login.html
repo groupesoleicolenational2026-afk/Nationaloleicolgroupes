@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل دخول المشرفين - قطاع زيت الزيتون</title>
+    <title>تسجيل دخول المشرفين الجهويين - قطاع زيت الزيتون</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
@@ -20,49 +20,69 @@
 <body>
 
 <div class="login-card">
-    <h2>بوابة المشرفين</h2>
+    <h2>تسجيل دخول المشرف الجهوي</h2>
     <div class="form-group">
-        <label for="admin-region">اختر الجهة أو نوع الإشراف:</label>
+        <label for="admin-region">اختر الجهة:</label>
         <select id="admin-region">
-            <option value="">-- اختر الجهة --</option>
-            <option value="1">جهة مراكش آسفي</option>
-            <option value="2">جهة بني ملال خنيفرة</option>
-            <option value="3">جهة فاس مكناس</option>
-            <option value="4">جهة الشرق</option>
-            <option value="5">جهة طنجة تطوان الحسيمة</option>
-            <option value="all">المشرف العام (كل الجهات)</option>
+            <option value="">-- اختر الجهة التابعة لك --</option>
+            <option value="marrakech">جهة مراكش آسفي</option>
+            <option value="bnimellal">جهة بني ملال خنيفرة</option>
+            <option value="fes">جهة فاس مكناس</option>
+            <option value="cherk">جهة الشرق</option>
+            <option value="tanger">جهة طنجة تطوان الحسيمة</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label for="admin-pass">كلمة المرور:</label>
-        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور السرية">
+        <label for="admin-pass">كلمة المرور الخاصة بالجهة:</label>
+        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور السرية للجهة">
     </div>
 
-    <button onclick="loginAdmin()">دخول للوحة التحكم</button>
-    <div id="error-msg" class="error-msg">الجهة أو كلمة المرور غير صحيحة!</div>
+    <button onclick="loginRegionalAdmin()">دخول لوحة الجهة</button>
+    <div id="error-msg" class="error-msg">الجهة المختارة أو كلمة المرور غير صحيحة!</div>
 </div>
 
 <script>
-    function loginAdmin() {
+    function loginRegionalAdmin() {
         const region = document.getElementById('admin-region').value;
         const pass = document.getElementById('admin-pass').value;
         const errorDiv = document.getElementById('error-msg');
 
-        // يمكنك تخصيص كلمات مرور لكل جهة أو كلمة مرور موحدة للإشراف
-        if (pass === "OliveAdmin2026") {
-            if (region === "all") {
-                // توجيه المشرف العام إلى لوحة الإشراف الشاملة
-                window.location.href = "super-admin.html";
-            } else if (region) {
-                // توجيه مشرف الجهة إلى لوحته مع تمرير رقم الجهة في الرابط
-                window.location.href = `regional-admin.html?region=${region}`;
-            } else {
-                errorDiv.textContent = "الرجاء اختيار الجهة أولاً";
-                errorDiv.style.display = "block";
-            }
+        errorDiv.style.display = "none";
+
+        if (!region) {
+            errorDiv.textContent = "الرجاء اختيار الجهة أولاً";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        // تحديد صفحة لوحة التحكم وكلمة المرور الخاصة بكل جهة بدقة
+        // (يمكنك تغيير كلمات المرور أدناه حسب رغبتك لكل جهة)
+        let targetPage = "";
+        let correctPassword = "";
+
+        if (region === "marrakech") {
+            targetPage = "admin-marrakech.html";
+            correctPassword = "Marrakech012026"; // كلمة مرور مراكش
+        } else if (region === "bnimellal") {
+            targetPage = "admin-bnimellal.html";
+            correctPassword = "Bnimellal022026"; // كلمة مرور بني ملال
+        } else if (region === "fes") {
+            targetPage = "admin-fes.html";
+            correctPassword = "Fes032026"; // كلمة مرور فاس
+        } else if (region === "cherk") {
+            targetPage = "admin-cherk.html";
+            correctPassword = "Cherk042026"; // كلمة مرور الشرق
+        } else if (region === "tanger") {
+            targetPage = "admin-tanger.html";
+            correctPassword = "Tanger052026"; // كلمة مرور طنجة
+        }
+
+        // التحقق من صحة كلمة المرور للجهة المعنية
+        if (pass === correctPassword) {
+            window.location.href = targetPage;
         } else {
-            errorDiv.textContent = "كلمة المرور غير صحيحة";
+            errorDiv.textContent = "كلمة المرور غير صحيحة لهذه الجهة";
             errorDiv.style.display = "block";
         }
     }
