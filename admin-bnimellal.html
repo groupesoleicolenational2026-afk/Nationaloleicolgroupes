@@ -104,7 +104,7 @@
     }
 
     // دالة طلب حذف السجل وإرساله مباشرة لقاعدة بيانات المشرف العام
-    async function requestDelete(recordId, companyName) {
+        async function requestDelete(recordId, companyName) {
         const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام في لوحته:`);
         
         if (!reason || reason.trim() === "") {
@@ -112,7 +112,8 @@
             return;
         }
 
-        const currentRegionName = regionNameMap[regionId] || "جهة غير محددة";
+        // ضع اسم الجهة صريحاً هنا حسب الملف (مثال: "جهة بني ملال خنيفرة")
+        const currentRegionName = "جهة بني ملال خنيفرة";
 
         const { error } = await supabaseClient
             .from('delete_requests')
@@ -132,7 +133,7 @@
             alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام في انتظار قراره النهائي. ✅');
         }
     }
-
+    
     function renderCharts(data) {
         const provinceCounts = {};
         data.forEach(d => {
