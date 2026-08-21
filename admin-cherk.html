@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم الجهة - الإدارة الجهوية</title>
+    <title>لوحة تحكم الإدارة الجهوية - قطاع زيت الزيتون</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -10,39 +10,31 @@
         .container { max-width: 1200px; margin: auto; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .whatsapp-manager { background: #eef2ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-right: 5px solid #4f46e5; display: flex; align-items: center; gap: 10px; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; margin-top: 10px; }
         th { background: #1e293b; color: white; padding: 15px; text-align: right; }
         td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; }
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .status-success { background: #dcfce7; color: #166534; }
         .status-danger { background: #fee2e2; color: #991b1b; }
-        button { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
-        button:hover { background: #4338ca; }
-        .delete-btn { background: #dc2626; padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+        .delete-btn { background: #dc2626; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
         .delete-btn:hover { background: #b91c1c; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1 style="color: #1e293b; margin-bottom: 5px;">📊 لوحة تحكم الإدارة الجهوية</h1>
-    <p style="color: #666; margin-bottom: 20px;">متابعة طلبات المنخرطين وتسيير رابط الواتساب الجهوي</p>
-    
-    <div class="whatsapp-manager">
-        <label style="font-weight: bold;">رابط الواتساب الجهوي:</label>
-        <input type="text" id="whatsappLinkInput" placeholder="جاري جلب الرابط الحالي...">
-        <button onclick="updateWhatsappLink()">تحديث الرابط</button>
-    </div>
+    <p style="color: #666; margin-bottom: 25px;">متابعة طلبات المنخرطين، الإحصائيات، وتدبير السجلات المحلية</p>
 
+    <!-- الرسوم البيانية الإحصائية -->
     <div class="dashboard-grid">
         <div class="card"><canvas id="provincesChart"></canvas></div>
         <div class="card"><canvas id="statusChart"></canvas></div>
     </div>
 
+    <!-- جدول المنخرطين مع خاصية الحذف الموضعي -->
     <div class="card">
-        <h3 style="margin-top: 0; color: #1e293b;">قائمة المنخرطين المسجلين</h3>
+        <h3 style="margin-top: 0; color: #1e293b;">قائمة المنخرطين المسجلين في الجهة</h3>
         <table>
             <thead>
                 <tr>
@@ -56,7 +48,7 @@
                 </tr>
             </thead>
             <tbody id="submissionsTableBody">
-                <tr><td colspan="7" style="text-align: center; color: #666;">جاري تحميل البيانات...</td></tr>
+                <tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
@@ -67,41 +59,13 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ⚠️ قم بتغيير رقم الجهة هنا حسب كل ملف جهوي (1: مراكش، 2: بني ملال، 3: فاس، 4: الشرق، 5: طنجة)
+    // ⚠️ قم بتغيير رقم الجهة هنا حسب الملف (1: مراكش، 2: بني ملال، 3: فاس، 4: الشرق، 5: طنجة)
     const regionId = 4; 
     let provincesChartInstance = null;
     let statusChartInstance = null;
 
     async function initDashboard() {
-        await fetchWhatsappLink();
         await fetchData();
-    }
-
-    async function fetchWhatsappLink() {
-        const { data, error } = await supabaseClient
-            .from('regions')
-            .select('whatsapp_link')
-            .eq('id', regionId)
-            .single();
-
-        if (!error && data) {
-            document.getElementById('whatsappLinkInput').value = data.whatsapp_link || '';
-        }
-    }
-
-    async function updateWhatsappLink() {
-        const newLink = document.getElementById('whatsappLinkInput').value.trim();
-        const { error } = await supabaseClient
-            .from('regions')
-            .update({ whatsapp_link: newLink })
-            .eq('id', regionId);
-
-        if (error) {
-            alert('حدث خطأ أثناء تحديث الرابط. تأكد من صلاحيات قاعدة البيانات (RLS).');
-            console.error(error);
-        } else {
-            alert('تم تحديث رابط الواتساب الجهوي بنجاح! 🟢');
-        }
     }
 
     async function fetchData() {
@@ -120,26 +84,25 @@
         renderCharts(data);
     }
 
-    // دالة حذف التسجيل الخاطئ من قاعدة البيانات
-async function deleteSubmission(id) {
-    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التسجيل نهائياً؟')) return;
+    // دالة حذف التسجيل الخاطئ أو المكرر
+    async function deleteSubmission(id) {
+        if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التسجيل نهائياً؟')) return;
 
-    // تحويل الid إلى رقم إذا كان المعرف رقمياً في قاعدة البيانات، أو إبقاؤه نصاً إذا كان UUID
-    const recordId = isNaN(id) ? id : Number(id);
+        const recordId = isNaN(id) ? id : Number(id);
 
-    const { data, error } = await supabaseClient
-        .from('submissions')
-        .delete()
-        .eq('id', recordId);
+        const { error } = await supabaseClient
+            .from('submissions')
+            .delete()
+            .eq('id', recordId);
 
-    if (error) {
-        alert('حدث خطأ أثناء محاولة الحذف: ' + error.message);
-        console.error(error);
-    } else {
-        alert('تم حذف التسجيل بنجاح.');
-        fetchData(); // إعادة تحديث الجدول فوراً
+        if (error) {
+            alert('حدث خطأ أثناء محاولة الحذف.');
+            console.error(error);
+        } else {
+            alert('تم حذف التسجيل بنجاح.');
+            fetchData(); // تحديث الجدول فوراً
+        }
     }
-}
 
     function renderCharts(data) {
         const provinceCounts = {};
@@ -195,7 +158,7 @@ async function deleteSubmission(id) {
                 <td>${d.activity_nature || '-'}</td>
                 <td>${d.license_status || '-'}</td>
                 <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
-                <td><span class="badge ${d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result}</span></td>
+                <td><span class="badge ${d.result && d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result || '-'}</span></td>
                 <td>
                     <button class="delete-btn" onclick="deleteSubmission('${d.id}')">حذف</button>
                 </td>
@@ -205,7 +168,7 @@ async function deleteSubmission(id) {
 
     initDashboard();
 
-    // التحديث الفوري عند حدوث إدخال جديد أو حذف
+    // التحديث الفوري عند حدوث أي تغيير في قاعدة البيانات لهذه الجهة
     supabaseClient
         .channel('public:submissions-regional')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, payload => {
