@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>بوابة الإشراف العام | المجموعة الوطنية لأرباب المعاصر و تسويق زيت الزيتون</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
             --olive-dark: #3e4f3a; 
@@ -17,54 +18,89 @@
             background-color: var(--cream);
             background-image: radial-gradient(var(--olive-light) 0.5px, transparent 0.5px);
             background-size: 30px 30px;
-            height: 100vh; 
+            min-height: 100vh; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
+            padding: 20px;
+            box-sizing: border-box;
         }
         .card { 
             background: rgba(255, 255, 255, 0.95); 
-            padding: 40px; 
+            padding: 30px; 
             border-radius: 30px; 
             box-shadow: 0 15px 35px rgba(62, 79, 58, 0.2); 
             text-align: center; 
             width: 90%; 
-            max-width: 500px; 
+            max-width: 600px; 
             border: 2px solid var(--olive-light);
         }
-        .logo { width: 150px; margin-bottom: 15px; }
-        h1 { color: var(--olive-dark); margin-bottom: 10px; font-size: 1.2rem; line-height: 1.4; }
-        p { color: #666; margin-bottom: 25px; }
-        input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        button { background: var(--olive-dark); color: white; padding: 15px 40px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: var(--gold); transform: scale(1.05); }
-        .grid { display: none; grid-template-columns: 1fr; gap: 12px; margin-top: 25px; }
-        .btn { color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; display: block; }
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+        .logo { width: 130px; margin-bottom: 10px; }
+        h1 { color: var(--olive-dark); margin-bottom: 10px; font-size: 1.1rem; line-height: 1.4; }
+        p { color: #666; margin-bottom: 20px; font-size: 14px; }
+        input[type="password"], input[type="text"], select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        button { background: var(--olive-dark); color: white; padding: 12px 30px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: var(--gold); transform: scale(1.02); }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .btn { color: white; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; display: block; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .whatsapp-master-box { background: #eef2ff; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid #4f46e5; text-align: right; }
     </style>
 </head>
 <body>
 
+<!-- شاشة تسجيل الدخول -->
 <div class="card" id="loginBox">
     <img src="logo.png" alt="شعار المجموعة" class="logo">
     <h1>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون بالمغرب</h1>
-    <p>بوابة الإشراف العام - لوحات التحكم الجهوية</p>
+    <p>بوابة الإشراف العام - لوحات التحكم الجهوية والمركزية</p>
     <input type="password" id="password" placeholder="كلمة المرور">
     <button onclick="checkPassword()">دخول آمن</button>
 </div>
 
+<!-- قائمة الإدارة الشاملة للمشرف العام -->
 <div class="card" id="menuBox" style="display: none;">
-    <h1 style="color: var(--olive-dark); font-size: 1.2rem;">اختر الجهة للإدارة</h1>
-    <div class="grid" id="menuGrid" style="display: grid;">
-        <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;">جهة مراكش آسفي</a>
-        <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;">جهة بني ملال خنيفرة</a>
-        <a href="admin-fes.html" class="btn" style="background: #7a8b75;">جهة فاس مكناس</a>
-        <a href="admin-cherk.html" class="btn" style="background: #a5b4a3;">جهة الشرق</a>
-        <a href="admin-tanger.html" class="btn" style="background: #c5a059;">جهة طنجة تطوان الحسيمة</a>
+    <h1 style="color: var(--olive-dark); font-size: 1.2rem; margin-bottom: 15px;">🌐 لوحة الإدارة المركزية والمشرف العام</h1>
+
+    <!-- قسم تدبير وتحديث روابط الواتساب حصرياً للمشرف العام -->
+    <div class="whatsapp-master-box">
+        <h3 style="margin-top: 0; color: #312e81; font-size: 1rem;">📱 تدبير روابط مجموعات الواتساب الجهوية</h3>
+        <p style="font-size: 13px; color: #475569; margin-bottom: 10px;">اختر الجهة لتحديث رابط الواتساب الخاص بها مركزياً:</p>
+        
+        <select id="targetRegionWhatsapp" onchange="loadRegionWhatsappLink()">
+            <option value="">-- اختر الجهة --</option>
+            <option value="1">جهة مراكش آسفي</option>
+            <option value="2">جهة بني ملال خنيفرة</option>
+            <option value="3">جهة فاس مكناس</option>
+            <option value="4">جهة الشرق</option>
+            <option value="5">جهة طنجة تطوان الحسيمة</option>
+        </select>
+        
+        <input type="text" id="masterWhatsappInput" placeholder="رابط مجموعة الواتساب الجديد...">
+        <button onclick="updateMasterWhatsappLink()" style="background: #4f46e5; width: 100%; margin-top: 5px;">حفظ تحديث الرابط</button>
+    </div>
+
+    <div class="grid">
+        <!-- زر اللوحة الوطنية الشاملة (تنزيل الجداول) -->
+        <a href="admin-national.html" class="btn" style="background: #059669; margin-bottom: 5px;">📥 لوحة الإشراف الوطني الشامل وجداول التنزيل</a>
+        
+        <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 10px 0;">
+        <p style="font-size: 13px; color: #666; margin: 0 0 5px 0;">لوحات المتابعة والحذف الموضعي لكل جهة:</p>
+
+        <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة -->
+        <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;">متابعة جهة مراكش آسفي</a>
+        <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;">متابعة جهة بني ملال خنيفرة</a>
+        <a href="admin-fes.html" class="btn" style="background: #7a8b75;">متابعة جهة فاس مكناس</a>
+        <a href="admin-cherk.html" class="btn" style="background: #a5b4a3;">متابعة جهة الشرق</a>
+        <a href="admin-tanger.html" class="btn" style="background: #c5a059;">متابعة جهة طنجة تطوان الحسيمة</a>
     </div>
 </div>
 
 <script>
+    const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     function checkPassword() {
         const pass = document.getElementById('password').value;
         if (pass === "123456") { 
@@ -72,6 +108,50 @@
             document.getElementById('menuBox').style.display = 'block';
         } else {
             alert("كلمة المرور خاطئة، يرجى المحاولة مجدداً.");
+        }
+    }
+
+    // جلب رابط الواتساب الحالي للجهة المختارة
+    async function loadRegionWhatsappLink() {
+        const regId = document.getElementById('targetRegionWhatsapp').value;
+        const inputField = document.getElementById('masterWhatsappInput');
+        
+        if (!regId) {
+            inputField.value = '';
+            return;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('regions')
+            .select('whatsapp_link')
+            .eq('id', regId)
+            .single();
+
+        if (!error && data) {
+            inputField.value = data.whatsapp_link || '';
+        }
+    }
+
+    // حفظ تحديث رابط الواتساب الجديد في قاعدة البيانات
+    async function updateMasterWhatsappLink() {
+        const regId = document.getElementById('targetRegionWhatsapp').value;
+        const newLink = document.getElementById('masterWhatsappInput').value.trim();
+
+        if (!regId) {
+            alert('الرجاء اختيار الجهة أولاً.');
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('regions')
+            .update({ whatsapp_link: newLink })
+            .eq('id', regId);
+
+        if (error) {
+            alert('حدث خطأ أثناء تحديث الرابط.');
+            console.error(error);
+        } else {
+            alert('تم تحديث رابط الواتساب الجهوي بنجاح من بوابة المشرف العام! 🟢');
         }
     }
 </script>
