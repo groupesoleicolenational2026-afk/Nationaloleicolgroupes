@@ -41,12 +41,13 @@
         <div class="card"><canvas id="statusChart"></canvas></div>
     </div>
 
-    <!-- جدول المنخرطين مع خاصية طلب الحذف الآمن -->
+    <!-- جدول المنخرطين مع خاصية طلب الحذف المرتبط بالـ ID -->
     <div class="card">
         <h3 style="margin-top: 0; color: var(--olive-dark);">قائمة المنخرطين المسجلين في الجهة</h3>
         <table>
             <thead>
                 <tr>
+                    <th>الرقم التعريفي (ID)</th>
                     <th>تاريخ الإنضمام</th>
                     <th>التسمية التجارية</th>
                     <th>طبيعة النشاط</th>
@@ -57,7 +58,7 @@
                 </tr>
             </thead>
             <tbody id="submissionsTableBody">
-                <tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
+                <tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
@@ -68,7 +69,7 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ⚠️ قم بتغيير رقم الجهة هنا حسب الملف (1: مراكش، 2: بني ملال، 3: فاس، 4: الشرق، 5: طنجة)
+    // ⚠️ قم بتغيير رقم الجهة هنا حسب الملف (1: مراكش، 2: بني ملال، إلخ)
     const regionId = 2; 
 
     let provincesChartInstance = null;
@@ -94,9 +95,9 @@
         renderCharts(data);
     }
 
-    // دالة طلب الحذف المتوافقة تماماً مع لوحة المشرف العام
+    // دالة طلب الحذف المرتبطة حصرياً بالرقم التعريفي ID للمنخرط
     async function requestDelete(recordId, companyName) {
-        const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام في لوحته:`);
+        const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\nالرجاء إدخال سبب طلب الحذف:`);
         
         if (!reason || reason.trim() === "") {
             alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
@@ -109,14 +110,14 @@
                 deletion_requested: true, 
                 deletion_reason: reason.trim() 
             })
-            .eq('id', recordId);
+            .eq('id', recordId); // الربط القاطع بالرقم التعريفي
 
         if (error) {
             alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
             console.error(error);
         } else {
-            alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام في انتظار قراره النهائي. ✅');
-            fetchData(); // تحديث الجدول محلياً لعرض الحالة الجديدة
+            alert('تم إرسال طلب الحذف بنجاح مع ربطه بالرقم التعريفي للمشرف العام. ✅');
+            fetchData();
         }
     }
 
@@ -163,7 +164,7 @@
         const tbody = document.getElementById('submissionsTableBody');
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">لا توجد طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">لا توجد طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
             return;
         }
 
@@ -172,6 +173,7 @@
             
             return `
                 <tr>
+                    <td><strong style="color: #4f46e5;">#${d.id}</strong></td>
                     <td>${new Date(d.created_at).toLocaleDateString('ar-MA')}</td>
                     <td><strong>${d.company_name || '-'}</strong></td>
                     <td>${d.activity_nature || '-'}</td>
@@ -191,7 +193,6 @@
 
     initDashboard();
 
-    // التحديث الفوري عند حدوث أي تغيير في بيانات الجهة
     supabaseClient
         .channel('public:submissions-regional')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, payload => {
