@@ -113,7 +113,6 @@
 
     async function initNationalPanel() {
         await fetchNationalData();
-        await fetchDeleteRequests();
     }
 
     async function fetchNationalData() {
@@ -126,24 +125,17 @@
             allNationalData = data;
             currentFilteredData = data;
             renderNationalTable(data);
+            renderDeleteRequests(data); // استخراج طلبات الحذف من نفس البيانات المجلوبة
         }
     }
 
-    // جلب طلبات الحذف المعلقة
-    async function fetchDeleteRequests() {
-        const { data, error } = await supabaseClient
-            .from('delete_requests')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (!error) {
-            renderDeleteRequests(data);
-        }
-    }
-
-    function renderDeleteRequests(requests) {
+    // تصفية وعرض طلبات الحذف التي تم تفعيلها من طرف المشرفين الجهويين
+    function renderDeleteRequests(data) {
         const container = document.getElementById('deleteRequestsContainer');
         const badge = document.getElementById('requestsCountBadge');
+        
+        // تصفية السجلات التي تحتوي على طلب حذف
+        const requests = data.filter(d => d.deletion_requested === true);
         
         badge.textContent = requests.length;
 
@@ -155,54 +147,52 @@
         container.innerHTML = requests.map(req => `
             <div class="request-item">
                 <div>
-                    <strong>الجهة:</strong> ${req.region_name} | 
-                    <strong>المعصرة:</strong> ${req.company_name} <br>
-                    <span style="color: #b45309; font-size: 13px;"><strong>السبب:</strong> ${req.reason}</span>
+                    <strong>الجهة:</strong> ${req.regions?.name_ar || 'غير محددة'} | 
+                    <strong>المعصرة:</strong> ${req.company_name || 'بدون اسم'} <br>
+                    <span style="color: #b45309; font-size: 13px;"><strong>السبب:</strong> ${req.deletion_reason || 'بدون سبب'}</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button class="approve-btn" onclick="approveDelete('${req.id}', '${req.submission_id}')">موافقة وحذف السجل</button>
+                    <button class="approve-btn" onclick="approveDelete('${req.id}')">موافقة وحذف السجل</button>
                     <button class="reject-btn" onclick="rejectDelete('${req.id}')">رفض الطلب</button>
                 </div>
             </div>
         `).join('');
     }
 
-    // موافقة المشرف العام وحذف السجل نهائياً من قاعدة البيانات وإزالة طلب الحذف
-    async function approveDelete(requestId, submissionId) {
+    // موافقة المشرف العام وحذف السجل نهائياً
+    async function approveDelete(submissionId) {
         if (!confirm('هل أنت متأكد من الموافقة على الحذف النهائي لهذا السجل؟')) return;
 
-        // 1. حذف السجل الأساسي من جدول submissions
-        const { error: err1 } = await supabaseClient
+        const { error } = await supabaseClient
             .from('submissions')
             .delete()
-            .eq('id', submissionId);
+            .eq('id', Number(submissionId));
 
-        // 2. حذف الطلب من جدول delete_requests
-        const { error: err2 } = await supabaseClient
-            .from('delete_requests')
-            .delete()
-            .eq('id', requestId);
-
-        if (err1 || err2) {
+        if (error) {
             alert('حدث خطأ أثناء إتمام عملية الحذف.');
         } else {
             alert('تم قبول طلب الحذف وحذف المعصرة بنجاح.');
-            initNationalPanel();
+            fetchNationalData();
         }
     }
 
-    // رفض طلب الحذف وحذفه من قائمة التنبيهات فقط
-    async function rejectDelete(requestId) {
+    // رفض طلب الحذف وإلغاء حالة الطلب
+    async function rejectDelete(submissionId) {
         if (!confirm('هل تريد رفض طلب الحذف؟')) return;
 
         const { error } = await supabaseClient
-            .from('delete_requests')
-            .delete()
-            .eq('id', requestId);
+            .from('submissions')
+            .update({ 
+                deletion_requested: false, 
+                deletion_reason: null 
+            })
+            .eq('id', Number(submissionId));
 
-        if (!error) {
-            alert('تم رفض طلب الحذف.');
-            fetchDeleteRequests();
+        if (error) {
+            alert('حدث خطأ أثناء رفض الطلب.');
+        } else {
+            alert('تم رفض طلب الحذف وإعادة السجل لوضعه الطبيعي.');
+            fetchNationalData();
         }
     }
 
@@ -283,11 +273,10 @@
 
     initNationalPanel();
 
-    // التحديث الفوري (Realtime) للبيانات وطلبات الحذف
+    // التحديث الفوري (Realtime) للبيانات
     supabaseClient
         .channel('public:national-master-portal')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchNationalData())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'delete_requests' }, () => fetchDeleteRequests())
         .subscribe();
 </script>
 </body>
