@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم جهة بني ملال خنيفرة - الإدارة الجهوية</title>
+    <title>لوحة تحكم الجهة - الإدارة الجهوية</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -19,13 +19,15 @@
         .status-danger { background: #fee2e2; color: #991b1b; }
         button { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
         button:hover { background: #4338ca; }
+        .delete-btn { background: #dc2626; padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+        .delete-btn:hover { background: #b91c1c; }
         input[type="text"] { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="color: #1e293b; margin-bottom: 5px;">📊 لوحة تحكم جهة بني ملال خنيفرة</h1>
+    <h1 style="color: #1e293b; margin-bottom: 5px;">📊 لوحة تحكم الإدارة الجهوية</h1>
     <p style="color: #666; margin-bottom: 20px;">متابعة طلبات المنخرطين وتسيير رابط الواتساب الجهوي</p>
     
     <div class="whatsapp-manager">
@@ -50,32 +52,31 @@
                     <th>الترخيص الصحي</th>
                     <th>الإقليم / الجماعة</th>
                     <th>الوضعية</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="submissionsTableBody">
-                <tr><td colspan="6" style="text-align: center; color: #666;">جاري تحميل البيانات...</td></tr>
+                <tr><td colspan="7" style="text-align: center; color: #666;">جاري تحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // الإعدادات الخاصة بقاعدة البيانات
     const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const regionId = 2; // معرّف جهة بني ملال خنيفرة
+    // ⚠️ قم بتغيير رقم الجهة هنا حسب كل ملف جهوي (1: مراكش، 2: بني ملال، 3: فاس، 4: الشرق، 5: طنجة)
+    const regionId = 2; 
     let provincesChartInstance = null;
     let statusChartInstance = null;
 
-    // جلب بيانات الرابط والطلبات عند فتح الصفحة
     async function initDashboard() {
         await fetchWhatsappLink();
         await fetchData();
     }
 
-    // جلب رابط الواتساب الحالي للجهة من قاعدة البيانات
     async function fetchWhatsappLink() {
         const { data, error } = await supabaseClient
             .from('regions')
@@ -88,7 +89,6 @@
         }
     }
 
-    // تحديث رابط الواتساب في قاعدة البيانات
     async function updateWhatsappLink() {
         const newLink = document.getElementById('whatsappLinkInput').value.trim();
         const { error } = await supabaseClient
@@ -97,21 +97,17 @@
             .eq('id', regionId);
 
         if (error) {
-            alert('حدث خطأ أثناء تحديث الرابط.');
+            alert('حدث خطأ أثناء تحديث الرابط. تأكد من صلاحيات قاعدة البيانات (RLS).');
             console.error(error);
         } else {
             alert('تم تحديث رابط الواتساب الجهوي بنجاح! 🟢');
         }
     }
 
-    // جلب طلبات المنخرطين مع أسماء الأقاليم المرتبطة
     async function fetchData() {
         const { data, error } = await supabaseClient
             .from('submissions')
-            .select(`
-                *,
-                provinces (name_ar)
-            `)
+            .select(`*, provinces (name_ar)`)
             .eq('region_id', regionId)
             .order('created_at', { ascending: false });
 
@@ -124,7 +120,24 @@
         renderCharts(data);
     }
 
-    // رسم المبيعات أو الإحصائيات (Charts)
+    // دالة حذف التسجيل الخاطئ من قاعدة البيانات
+    async function deleteSubmission(id) {
+        if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التسجيل نهائياً؟')) return;
+
+        const { error } = await supabaseClient
+            .from('submissions')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert('حدث خطأ أثناء محاولة الحذف.');
+            console.error(error);
+        } else {
+            alert('تم حذف التسجيل بنجاح.');
+            fetchData(); // تحديث الجدول فوراً
+        }
+    }
+
     function renderCharts(data) {
         const provinceCounts = {};
         data.forEach(d => {
@@ -141,7 +154,6 @@
             }
         });
 
-        // رسم دائري للأقاليم
         const ctxProv = document.getElementById('provincesChart').getContext('2d');
         if (provincesChartInstance) provincesChartInstance.destroy();
         provincesChartInstance = new Chart(ctxProv, {
@@ -153,7 +165,6 @@
             options: { responsive: true, plugins: { title: { display: true, text: 'توزيع الطلبات حسب الأقاليم' } } }
         });
 
-        // رسم أعمدة للتراخيص
         const ctxStatus = document.getElementById('statusChart').getContext('2d');
         if (statusChartInstance) statusChartInstance.destroy();
         statusChartInstance = new Chart(ctxStatus, {
@@ -166,12 +177,11 @@
         });
     }
 
-    // عرض البيانات في الجدول
     function renderTable(data) {
         const tbody = document.getElementById('submissionsTableBody');
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 20px;">لا توجد طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">لا توجد طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
             return;
         }
 
@@ -183,21 +193,20 @@
                 <td>${d.license_status || '-'}</td>
                 <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
                 <td><span class="badge ${d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result}</span></td>
+                <td>
+                    <button class="delete-btn" onclick="deleteSubmission('${d.id}')">حذف</button>
+                </td>
             </tr>
         `).join('');
     }
 
-    // تشغيل جلب البيانات عند فتح الصفحة
     initDashboard();
 
-    // ميزة التحديث الفوري (Realtime) عند تسجيل منخرط جديد في نفس الجهة
+    // التحديث الفوري عند حدوث إدخال جديد أو حذف
     supabaseClient
-        .channel('public:submissions-bnimellal')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'submissions' }, payload => {
-            if (payload.new.region_id === regionId) {
-                console.log('تم تسجيل منخرط جديد في جهة بني ملال، جاري التحديث...');
-                fetchData();
-            }
+        .channel('public:submissions-regional')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, payload => {
+            fetchData();
         })
         .subscribe();
 </script>
