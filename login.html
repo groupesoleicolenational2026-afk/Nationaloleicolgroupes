@@ -43,7 +43,7 @@
 </div>
 
 <script>
-    function loginRegionalAdmin() {
+        function loginRegionalAdmin() {
         const region = document.getElementById('admin-region').value;
         const pass = document.getElementById('admin-pass').value;
         const errorDiv = document.getElementById('error-msg');
@@ -56,29 +56,27 @@
             return;
         }
 
-        // تحديد صفحة لوحة التحكم وكلمة المرور الخاصة بكل جهة بدقة
-        // (يمكنك تغيير كلمات المرور أدناه حسب رغبتك لكل جهة)
         let targetPage = "";
         let correctPassword = "";
 
+        // مطابقة الأسماء حرفياً مع ملفات GitHub الخاصة بك
         if (region === "marrakech") {
             targetPage = "admin-marrakech.html";
-            correctPassword = "Marrakech012026"; // كلمة مرور مراكش
+            correctPassword = "Marrakech2026"; 
         } else if (region === "bnimellal") {
             targetPage = "admin-bnimellal.html";
-            correctPassword = "Bnimellal022026"; // كلمة مرور بني ملال
+            correctPassword = "Bnimellal2026"; 
         } else if (region === "fes") {
             targetPage = "admin-fes.html";
-            correctPassword = "Fes032026"; // كلمة مرور فاس
+            correctPassword = "Fes2026"; 
         } else if (region === "cherk") {
             targetPage = "admin-cherk.html";
-            correctPassword = "Cherk042026"; // كلمة مرور الشرق
+            correctPassword = "Cherk2026"; 
         } else if (region === "tanger") {
             targetPage = "admin-tanger.html";
-            correctPassword = "Tanger052026"; // كلمة مرور طنجة
+            correctPassword = "Tanger2026"; 
         }
 
-        // التحقق من صحة كلمة المرور للجهة المعنية
         if (pass === correctPassword) {
             window.location.href = targetPage;
         } else {
@@ -86,6 +84,7 @@
             errorDiv.style.display = "block";
         }
     }
+    
 </script>
 
 </body>
