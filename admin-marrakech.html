@@ -122,21 +122,24 @@
 
     // دالة حذف التسجيل الخاطئ من قاعدة البيانات
     async function deleteSubmission(id) {
-        if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التسجيل نهائياً؟')) return;
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التسجيل نهائياً؟')) return;
 
-        const { error } = await supabaseClient
-            .from('submissions')
-            .delete()
-            .eq('id', id);
+    // تحويل الid إلى رقم إذا كان المعرف رقمياً في قاعدة البيانات، أو إبقاؤه نصاً إذا كان UUID
+    const recordId = isNaN(id) ? id : Number(id);
 
-        if (error) {
-            alert('حدث خطأ أثناء محاولة الحذف.');
-            console.error(error);
-        } else {
-            alert('تم حذف التسجيل بنجاح.');
-            fetchData(); // تحديث الجدول فوراً
-        }
+    const { data, error } = await supabaseClient
+        .from('submissions')
+        .delete()
+        .eq('id', recordId);
+
+    if (error) {
+        alert('حدث خطأ أثناء محاولة الحذف: ' + error.message);
+        console.error(error);
+    } else {
+        alert('تم حذف التسجيل بنجاح.');
+        fetchData(); // إعادة تحديث الجدول فوراً
     }
+}
 
     function renderCharts(data) {
         const provinceCounts = {};
