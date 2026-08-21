@@ -2,22 +2,23 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>بوابة الإشراف العام | المجموعة الوطنية لأرباب المعاصر و تسويق زيت الزيتون</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الإشراف العام | المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
-            --olive-dark: #3e4f3a; 
-            --olive-light: #7a8b75; 
+            --olive-dark: #2d3b2a; 
+            --olive-light: #556b2f; 
             --gold: #c5a059; 
-            --cream: #f9f7f2; 
+            --cream: #f4f6f0; 
         }
         body { 
             font-family: 'Cairo', sans-serif; 
             margin: 0; 
-            background-color: var(--cream);
-            background-image: radial-gradient(var(--olive-light) 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
+            background: linear-gradient(135deg, rgba(45, 59, 42, 0.85), rgba(85, 107, 47, 0.8)), 
+                        url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh; 
             display: flex; 
             justify-content: center; 
@@ -26,41 +27,45 @@
             box-sizing: border-box;
         }
         .card { 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 30px; 
-            border-radius: 30px; 
-            box-shadow: 0 15px 35px rgba(62, 79, 58, 0.2); 
+            background: rgba(255, 255, 255, 0.96); 
+            padding: 35px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
             text-align: center; 
-            width: 90%; 
-            max-width: 600px; 
-            border: 2px solid var(--olive-light);
+            width: 100%; 
+            max-width: 550px; 
+            border: 2px solid var(--gold);
+            box-sizing: border-box;
         }
-        .logo { width: 130px; margin-bottom: 10px; }
-        h1 { color: var(--olive-dark); margin-bottom: 10px; font-size: 1.1rem; line-height: 1.4; }
-        p { color: #666; margin-bottom: 20px; font-size: 14px; }
-        input[type="password"], input[type="text"], select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        button { background: var(--olive-dark); color: white; padding: 12px 30px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .logo { width: 120px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.25rem; line-height: 1.5; font-weight: 700; }
+        p { color: #666; margin-bottom: 25px; font-size: 14px; }
+        input[type="password"], input[type="text"], select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; outline: none; transition: border-color 0.3s; background: #fff; }
+        input:focus, select:focus { border-color: var(--olive-light); }
+        button { background: var(--olive-dark); color: white; padding: 12px 30px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; font-family: 'Cairo', sans-serif; font-size: 16px; width: 100%; margin-top: 10px; }
         button:hover { background: var(--gold); transform: scale(1.02); }
         .grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
-        .btn { color: white; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; display: block; }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .btn { color: white; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; display: block; text-align: center; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
         .whatsapp-master-box { background: #eef2ff; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid #4f46e5; text-align: right; }
+        .error-msg { color: #dc2626; text-align: center; margin-top: 15px; font-size: 14px; display: none; font-weight: bold; background: #fee2e2; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
+<!-- شاشة تسجيل الدخول الآمن للمشرف العام -->
 <div class="card" id="loginBox">
     <img src="logo.png" alt="شعار المجموعة" class="logo">
-    <h1>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون بالمغرب</h1>
-    <p>بوابة الإشراف العام - لوحات التحكم الجهوية والمركزية</p>
-    <input type="password" id="password" placeholder="كلمة المرور">
-    <button onclick="checkPassword()">دخول آمن</button>
+    <h2>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</h2>
+    <p>بوابة الإشراف العام - تسجيل الدخول الآمن</p>
+    <input type="password" id="password" placeholder="أدخل كلمة المرور السرية للإشراف العام">
+    <button onclick="checkPassword()">دخول آمن للمشرف العام</button>
+    <div id="error-msg" class="error-msg">كلمة المرور غير صحيحة!</div>
 </div>
 
 <!-- قائمة الإدارة الشاملة للمشرف العام -->
-<div class="card" id="menuBox" style="display: none;">
-    <h1 style="color: var(--olive-dark); font-size: 1.2rem; margin-bottom: 15px;">🌐 لوحة الإدارة المركزية والمشرف العام</h1>
+<div class="card" id="menuBox" style="display: none; text-align: right;">
+    <h2 style="color: var(--olive-dark); font-size: 1.2rem; margin-bottom: 15px; text-align: center;">🌐 لوحة الإدارة المركزية والمشرف العام</h2>
 
     <!-- قسم تدبير وتحديث روابط الواتساب حصرياً للمشرف العام -->
     <div class="whatsapp-master-box">
@@ -77,7 +82,7 @@
         </select>
         
         <input type="text" id="masterWhatsappInput" placeholder="رابط مجموعة الواتساب الجديد...">
-        <button onclick="updateMasterWhatsappLink()" style="background: #4f46e5; width: 100%; margin-top: 5px;">حفظ تحديث الرابط</button>
+        <button onclick="updateMasterWhatsappLink()" style="background: #4f46e5; width: 100%; margin-top: 5px; font-size: 14px; padding: 10px;">حفظ تحديث الرابط</button>
     </div>
 
     <div class="grid">
@@ -85,7 +90,7 @@
         <a href="admin-national.html" class="btn" style="background: #059669; margin-bottom: 5px;">📥 لوحة الإشراف الوطني الشامل وجداول التنزيل</a>
         
         <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 10px 0;">
-        <p style="font-size: 13px; color: #666; margin: 0 0 5px 0;">لوحات المتابعة والحذف الموضعي لكل جهة:</p>
+        <p style="font-size: 13px; color: #666; margin: 0 0 5px 0; text-align: center;">لوحات المتابعة والحذف الموضعي لكل جهة:</p>
 
         <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة -->
         <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;">متابعة جهة مراكش آسفي</a>
@@ -103,11 +108,14 @@
 
     function checkPassword() {
         const pass = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-msg');
+        errorDiv.style.display = "none";
+
         if (pass === "123456") { 
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('menuBox').style.display = 'block';
         } else {
-            alert("كلمة المرور خاطئة، يرجى المحاولة مجدداً.");
+            errorDiv.style.display = "block";
         }
     }
 
