@@ -115,13 +115,13 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // دالة جلب الجهات وملء القائمة المنسدلة
+    // دالة جلب الجهات مع روابط الواتساب من قاعدة البيانات
     async function loadRegions() {
         const regionSelect = document.getElementById('region');
         
         const { data: regions, error } = await supabaseClient
             .from('regions')
-            .select('*')
+            .select('id, name_ar, whatsapp_link')
             .order('id');
 
         if (error) {
@@ -133,7 +133,8 @@
             const option = document.createElement('option');
             option.value = region.id;
             option.textContent = region.name_ar;
-            // يمكنك ربط رابط الواتساب هنا إذا أردت تخصيصه لكل جهة لاحقاً
+            // تخزين رابط الواتساب الخاص بكل جهة
+            option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
             regionSelect.appendChild(option);
         });
     }
@@ -183,9 +184,10 @@
         const provinceId = document.getElementById('province').value;
         const communeText = document.getElementById('commune').value;
         
-        // جلب رابط الواتساب المرتبط بالجهة المختارة (افتراضي أو مخصص)
+        // سحب رابط الواتساب الخاص بالجهة المختارة تلقائياً
         const regionSelect = document.getElementById('region');
-        const whatsappLink = "#"; // يمكنك تعديل رابط الواتساب حسب الحاجة
+        const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+        const whatsappLink = selectedOption?.getAttribute('data-whatsapp') || "#";
         
         const companyName = document.getElementById('companyName').value;
         const activityNature = document.getElementById('activityNature').value;
@@ -220,7 +222,7 @@
             finalResult = "قبول";
             messageHTML = `<div class="success">
                 <h3>🟢 مبروك، تم قبول طلبك بنجاح!</h3>
-                <p>يمكنك الآن الانضمام مباشرة إلى مجموعة WhatsApp الجهوية:</p>
+                <p>يمكنك الآن الانضمام مباشرة إلى مجموعة WhatsApp الجهوية الخاصة بجهتك:</p>
                 <a href="${whatsappLink}" target="_blank" class="whatsapp-btn">الانضمام إلى مجموعة الواتساب الجهوية</a>
             </div>`;
         }
