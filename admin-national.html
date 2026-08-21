@@ -25,9 +25,9 @@
         .export-btn:hover { background: #047857; }
         .delete-btn { background: #dc2626; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; font-family: 'Cairo', sans-serif; }
         .delete-btn:hover { background: #b91c1c; }
-        .approve-btn { background: #16a34a; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .approve-btn { background: #16a34a; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .approve-btn:hover { background: #15803d; }
-        .reject-btn { background: #ca8a04; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .reject-btn { background: #ca8a04; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .reject-btn:hover { background: #a16207; }
         
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -47,7 +47,7 @@
     <div class="header-box">
         <div>
             <h1 style="color: var(--olive-dark); margin: 0 0 5px 0;">🌐 لوحة الإشراف الوطني الشامل</h1>
-            <p style="color: #666; margin: 0;">إدارة البيانات، وتدبير طلبات الحذف الواردة من المشرفين الجهويين</p>
+            <p style="color: #666; margin: 0;">الإدارة المركزية المطلقة: متابعة البيانات وتدبير طلبات الحذف الواردة من الجهات</p>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="export-btn" onclick="exportCurrentViewCSV()">📥 تنزيل الجدول المعروض حالياً</button>
@@ -121,20 +121,23 @@
             .select(`*, regions (id, name_ar), provinces (name_ar)`)
             .order('created_at', { ascending: false });
 
-        if (!error) {
-            allNationalData = data;
-            currentFilteredData = data;
-            renderNationalTable(data);
-            renderDeleteRequests(data); // استخراج طلبات الحذف من نفس البيانات المجلوبة
+        if (error) {
+            console.error('خطأ في جلب البيانات:', error);
+            return;
         }
+
+        allNationalData = data || [];
+        currentFilteredData = allNationalData;
+        renderNationalTable(currentFilteredData);
+        renderDeleteRequests(allNationalData);
     }
 
-    // تصفية وعرض طلبات الحذف التي تم تفعيلها من طرف المشرفين الجهويين
+    // تصفية وعرض طلبات الحذف المعلقة في صندوق التنبيهات
     function renderDeleteRequests(data) {
         const container = document.getElementById('deleteRequestsContainer');
         const badge = document.getElementById('requestsCountBadge');
         
-        // تصفية السجلات التي تحتوي على طلب حذف
+        // استخراج السجلات التي طُلب حذفها فقط
         const requests = data.filter(d => d.deletion_requested === true);
         
         badge.textContent = requests.length;
@@ -159,7 +162,7 @@
         `).join('');
     }
 
-    // موافقة المشرف العام وحذف السجل نهائياً
+    // موافقة المشرف العام وحذف السجل نهائياً من قاعدة البيانات
     async function approveDelete(submissionId) {
         if (!confirm('هل أنت متأكد من الموافقة على الحذف النهائي لهذا السجل؟')) return;
 
@@ -170,13 +173,14 @@
 
         if (error) {
             alert('حدث خطأ أثناء إتمام عملية الحذف.');
+            console.error(error);
         } else {
-            alert('تم قبول طلب الحذف وحذف المعصرة بنجاح.');
+            alert('تم قبول طلب الحذف وحذف المعصرة بنجاح من النظام.');
             fetchNationalData();
         }
     }
 
-    // رفض طلب الحذف وإلغاء حالة الطلب
+    // رفض طلب الحذف وإلغاء علامة الطلب ليعود السجل لوضعه الطبيعي
     async function rejectDelete(submissionId) {
         if (!confirm('هل تريد رفض طلب الحذف؟')) return;
 
@@ -190,12 +194,14 @@
 
         if (error) {
             alert('حدث خطأ أثناء رفض الطلب.');
+            console.error(error);
         } else {
             alert('تم رفض طلب الحذف وإعادة السجل لوضعه الطبيعي.');
             fetchNationalData();
         }
     }
 
+    // الحذف المباشر من الجدول الوطني العام
     async function deleteSubmissionMaster(id) {
         if (!confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا التسجيل نهائياً؟')) return;
         
@@ -212,6 +218,7 @@
 
     function renderNationalTable(data) {
         const tbody = document.getElementById('nationalTableBody');
+        
         if (!data || data.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة حتى الآن.</td></tr>`;
             return;
@@ -273,10 +280,12 @@
 
     initNationalPanel();
 
-    // التحديث الفوري (Realtime) للبيانات
+    // التحديث الفوري (Realtime) لبيانات الجدول وطلبات الحذف
     supabaseClient
         .channel('public:national-master-portal')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchNationalData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => {
+            fetchNationalData();
+        })
         .subscribe();
 </script>
 </body>
