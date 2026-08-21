@@ -22,13 +22,14 @@
         .status-danger { background: #fee2e2; color: #991b1b; }
         .request-delete-btn { background: #d97706; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; font-family: 'Cairo', sans-serif; font-weight: bold; }
         .request-delete-btn:hover { background: #b45309; }
+        .requested-badge { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="top-bar">
-        <!-- زر الرجوع إلى بوابة تسجيل الدخول أو القائمة -->
+        <!-- زر الرجوع إلى الصفحة السابقة أو بوابة الدخول -->
         <a href="login.html" class="back-btn">← رجوع للصفحة السابقة</a>
     </div>
 
@@ -70,15 +71,6 @@
 
     // ⚠️ قم بتغيير رقم الجهة هنا حسب الملف (1: مراكش، 2: بني ملال، 3: فاس، 4: الشرق، 5: طنجة)
     const regionId = 1; 
-    
-    // اسم الجهة النصي ليظهر بوضوح لدى المشرف العام
-    const regionNameMap = {
-        1: "جهة مراكش آسفي",
-        2: "جهة بني ملال خنيفرة",
-        3: "جهة فاس مكناس",
-        4: "جهة الشرق",
-        5: "جهة طنجة تطوان الحسيمة"
-    };
 
     let provincesChartInstance = null;
     let statusChartInstance = null;
@@ -103,31 +95,31 @@
         renderCharts(data);
     }
 
-    // دالة طلب حذف السجل وإرساله مباشرة لقاعدة بيانات المشرف العام
+    // دالة طلب حذف السجل وتحديثه مباشرة في جدول submissions ليظهر لدى المشرف العام
     async function requestDelete(recordId, companyName) {
-    const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام:`);
-    
-    if (!reason || reason.trim() === "") {
-        alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
-        return;
-    }
+        const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرجاء إدخال سبب طلب الحذف ليطلع عليه المشرف العام في لوحته:`);
+        
+        if (!reason || reason.trim() === "") {
+            alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
+            return;
+        }
 
-    const { error } = await supabaseClient
-        .from('submissions')
-        .update({ 
-            deletion_requested: true, 
-            deletion_reason: reason.trim() 
-        })
-        .eq('id', recordId);
+        const { error } = await supabaseClient
+            .from('submissions')
+            .update({ 
+                deletion_requested: true, 
+                deletion_reason: reason.trim() 
+            })
+            .eq('id', recordId);
 
-    if (error) {
-        alert('حدث خطأ أثناء إرسال طلب الحذف.');
-        console.error(error);
-    } else {
-        alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام. ✅');
+        if (error) {
+            alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
+            console.error(error);
+        } else {
+            alert('تم إرسال طلب الحذف بنجاح إلى المشرف العام في انتظار قراره النهائي. ✅');
+            fetchData(); // تحديث الجدول محلياً لعرض الحالة الجديدة
+        }
     }
-    }
-    
 
     function renderCharts(data) {
         const provinceCounts = {};
@@ -176,19 +168,27 @@
             return;
         }
 
-        tbody.innerHTML = data.map(d => `
-            <tr>
-                <td>${new Date(d.created_at).toLocaleDateString('ar-MA')}</td>
-                <td><strong>${d.company_name || '-'}</strong></td>
-                <td>${d.activity_nature || '-'}</td>
-                <td>${d.license_status || '-'}</td>
-                <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
-                <td><span class="badge ${d.result && d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result || '-'}</span></td>
-                <td>
-                    <button class="request-delete-btn" onclick="requestDelete('${d.id}', '${d.company_name || 'بدون اسم'}')">طلب حذف</button>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = data.map(d => {
+            // التحقق مما إذا كان قد تم رفع طلب حذف مسبقاً لهذا السجل
+            const isRequested = d.deletion_requested === true;
+            
+            return `
+                <tr>
+                    <td>${new Date(d.created_at).toLocaleDateString('ar-MA')}</td>
+                    <td><strong>${d.company_name || '-'}</strong></td>
+                    <td>${d.activity_nature || '-'}</td>
+                    <td>${d.license_status || '-'}</td>
+                    <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
+                    <td><span class="badge ${d.result && d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result || '-'}</span></td>
+                    <td>
+                        ${isRequested 
+                            ? `<span class="requested-badge">⏳ في انتظار قرار المشرف</span>` 
+                            : `<button class="request-delete-btn" onclick="requestDelete('${d.id}', '${d.company_name || 'بدون اسم'}')">طلب حذف</button>`
+                        }
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     initDashboard();
