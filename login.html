@@ -3,24 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل دخول المشرفين الجهويين - قطاع زيت الزيتون</title>
+    <title>تسجيل دخول المشرفين الجهويين - المجموعات الجهوية لأرباب المعاصر وتسويق زيت الزيتون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        h2 { text-align: center; color: #1e3d59; margin-bottom: 25px; font-size: 22px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
-        select, input[type="password"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        select:focus, input[type="password"]:focus { border-color: #3b82f6; outline: none; }
-        button { background: #059669; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
-        button:hover { background: #047857; }
-        .error-msg { color: #dc2626; text-align: center; margin-top: 15px; font-size: 14px; display: none; }
+        :root { 
+            --olive-dark: #2d3b2a; 
+            --olive-light: #556b2f; 
+            --gold: #c5a059; 
+            --cream: #f4f6f0; 
+        }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            background: linear-gradient(135deg, rgba(45, 59, 42, 0.85), rgba(85, 107, 47, 0.8)), 
+                        url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-card { 
+            background: rgba(255, 255, 255, 0.96); 
+            padding: 40px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
+            width: 100%; 
+            max-width: 440px; 
+            box-sizing: border-box;
+            border: 2px solid var(--gold);
+            text-align: center;
+        }
+        .logo { width: 120px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.25rem; line-height: 1.5; font-weight: 700; }
+        p { color: #666; margin-bottom: 25px; font-size: 14px; }
+        .form-group { margin-bottom: 20px; text-align: right; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; font-size: 14px; }
+        select, input[type="password"] { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; outline: none; transition: border-color 0.3s; background: #fff; }
+        select:focus, input[type="password"]:focus { border-color: var(--olive-light); }
+        button { background: var(--olive-dark); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; padding: 14px; border-radius: 12px; font-size: 16px; width: 100%; font-family: 'Cairo', sans-serif; transition: background 0.3s, transform 0.2s; }
+        button:hover { background: var(--gold); transform: scale(1.02); }
+        .error-msg { color: #dc2626; text-align: center; margin-top: 15px; font-size: 14px; display: none; font-weight: bold; background: #fee2e2; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2>تسجيل دخول المشرف الجهوي</h2>
+    <img src="logo.png" alt="شعار المجموعة" class="logo">
+    <h2>المجموعات الجهوية لأرباب المعاصر وتسويق زيت الزيتون</h2>
+    <p>بوابة تسجيل دخول المشرفين الجهويين</p>
+
     <div class="form-group">
         <label for="admin-region">اختر الجهة:</label>
         <select id="admin-region">
@@ -43,7 +77,7 @@
 </div>
 
 <script>
-        function loginRegionalAdmin() {
+    function loginRegionalAdmin() {
         const region = document.getElementById('admin-region').value;
         const pass = document.getElementById('admin-pass').value;
         const errorDiv = document.getElementById('error-msg');
@@ -84,7 +118,6 @@
             errorDiv.style.display = "block";
         }
     }
-    
 </script>
 
 </body>
