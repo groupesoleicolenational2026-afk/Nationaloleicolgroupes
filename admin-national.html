@@ -16,7 +16,7 @@
         
         /* صندوق تنبيهات طلبات الحذف */
         .requests-box { background: #fffbeb; border: 2px solid #f59e0b; padding: 20px; border-radius: 15px; margin-bottom: 25px; }
-        .request-item { background: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; border-right: 4px solid #d97706; }
+        .request-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; border-right: 5px solid #dc2626; }
         
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
         th { background: var(--olive-dark); color: white; padding: 15px; text-align: right; }
@@ -25,9 +25,9 @@
         .export-btn:hover { background: #047857; }
         .delete-btn { background: #dc2626; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; font-family: 'Cairo', sans-serif; }
         .delete-btn:hover { background: #b91c1c; }
-        .approve-btn { background: #16a34a; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .approve-btn { background: #16a34a; color: white; border: none; padding: 8px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .approve-btn:hover { background: #15803d; }
-        .reject-btn { background: #ca8a04; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .reject-btn { background: #ca8a04; color: white; border: none; padding: 8px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .reject-btn:hover { background: #a16207; }
         
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -55,10 +55,10 @@
         </div>
     </div>
 
-    <!-- قسم تنبيهات طلبات الحذف الواردة من الجهات -->
+    <!-- قسم تنبيهات طلبات الحذف الواردة من الجهات مرتبطة بالـ ID -->
     <div class="requests-box">
         <h3 style="margin-top: 0; color: #b45309; display: flex; align-items: center; gap: 8px;">
-            📥 طلبات الحذف الواردة من المشرفين الجهويين 
+            📥 طلبات الحذف المعلقة المرتبطة بالمعرفات 
             <span id="requestsCountBadge" style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px;">0</span>
         </h3>
         <div id="deleteRequestsContainer">
@@ -66,7 +66,7 @@
         </div>
     </div>
 
-    <!-- لوحة التصفية وعرض الجداول -->
+    <!-- لوحة التصفية -->
     <div class="card">
         <div class="filter-box">
             <label style="font-weight: bold; font-size: 16px;">تصفية الجدول حسب الجهة:</label>
@@ -86,6 +86,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>الرقم التعريفي (ID)</th>
                     <th>تاريخ الإنضمام</th>
                     <th>الجهة</th>
                     <th>الإقليم / الجماعة</th>
@@ -97,7 +98,7 @@
                 </tr>
             </thead>
             <tbody id="nationalTableBody">
-                <tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
+                <tr><td colspan="9" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
@@ -132,7 +133,7 @@
         renderDeleteRequests(allNationalData);
     }
 
-    // فرز وعرض طلبات الحذف من نفس البيانات
+    // فرز وعرض طلبات الحذف المعتمدة على الرقم التعريفي ID
     function renderDeleteRequests(data) {
         const container = document.getElementById('deleteRequestsContainer');
         const badge = document.getElementById('requestsCountBadge');
@@ -149,8 +150,9 @@
         container.innerHTML = requests.map(req => `
             <div class="request-item">
                 <div>
-                    <strong>الجهة:</strong> ${req.regions?.name_ar || 'غير محددة'} | 
-                    <strong>المعصرة:</strong> ${req.company_name || 'بدون اسم'} <br>
+                    <span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">الرقم التعريفي (ID): #${req.id}</span>
+                    <span style="background: #e2e8f0; color: #1e3d59; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px;">${req.regions?.name_ar || 'غير محددة'}</span>
+                    <h4 style="margin: 8px 0 4px 0; color: var(--olive-dark);">المعصرة: ${req.company_name || 'بدون اسم'}</h4>
                     <span style="color: #b45309; font-size: 13px;"><strong>السبب:</strong> ${req.deletion_reason || 'بدون سبب'}</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -161,9 +163,9 @@
         `).join('');
     }
 
-    // موافقة المشرف العام وحذف السجل نهائياً
+    // موافقة المشرف العام وحذف السجل نهائياً باستخدام الرقم التعريفي ID
     async function approveDelete(submissionId) {
-        if (!confirm('هل أنت متأكد من الموافقة على الحذف النهائي لهذا السجل؟')) return;
+        if (!confirm(`هل أنت متأكد من الموافقة على الحذف النهائي للسجل رقم (#ID: ${submissionId})؟`)) return;
 
         const { error } = await supabaseClient
             .from('submissions')
@@ -171,16 +173,16 @@
             .eq('id', submissionId);
 
         if (error) {
-            alert('حدث خطأ أثناء الحذف.');
+            alert('حدث خطأ أثناء الحذف: ' + error.message);
         } else {
             alert('تم قبول طلب الحذف وحذف المعصرة بنجاح.');
             fetchNationalData();
         }
     }
 
-    // رفض طلب العودة وإلغاء علامة الحذف
+    // رفض طلب الحذف وإلغاء العلامة بالاعتماد على الرقم التعريفي ID
     async function rejectDelete(submissionId) {
-        if (!confirm('هل تريد رفض طلب الحذف؟')) return;
+        if (!confirm(`هل تريد رفض طلب الحذف للسجل رقم (#ID: ${submissionId})؟`)) return;
 
         const { error } = await supabaseClient
             .from('submissions')
@@ -188,7 +190,7 @@
             .eq('id', submissionId);
 
         if (error) {
-            alert('حدث خطأ أثناء الرفض.');
+            alert('حدث خطأ أثناء الرفض: ' + error.message);
         } else {
             alert('تم رفض طلب الحذف وإعادة السجل لوضعه الطبيعي.');
             fetchNationalData();
@@ -196,7 +198,7 @@
     }
 
     async function deleteSubmissionMaster(id) {
-        if (!confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا التسجيل نهائياً؟')) return;
+        if (!confirm(`⚠️ تحذير: هل أنت متأكد من حذف السجل رقم (#ID: ${id}) نهائياً؟`)) return;
         
         const { error } = await supabaseClient
             .from('submissions')
@@ -212,12 +214,13 @@
     function renderNationalTable(data) {
         const tbody = document.getElementById('nationalTableBody');
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة حتى الآن.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = data.map(d => `
             <tr>
+                <td><strong style="color: #4f46e5;">#${d.id}</strong></td>
                 <td>${new Date(d.created_at).toLocaleDateString('ar-MA')}</td>
                 <td><strong>${d.regions?.name_ar || '-'}</strong></td>
                 <td>${d.provinces?.name_ar || '-'} / ${d.commune || ''}</td>
@@ -247,9 +250,9 @@
             alert('لا توجد بيانات لتنزيلها.');
             return;
         }
-        let csv = '\uFEFFتاريخ الإنضمام,الجهة,الإقليم,الجماعة,التسمية التجارية,طبيعة النشاط,الترخيص الصحي,الوضعية\n';
+        let csv = '\uFEFFالرقم التعريفي,تاريخ الإنضمام,الجهة,الإقليم,الجماعة,التسمية التجارية,طبيعة النشاط,الترخيص الصحي,الوضعية\n';
         dataToExport.forEach(d => {
-            csv += `"${new Date(d.created_at).toLocaleDateString('ar-MA')}","${d.regions?.name_ar || ''}","${d.provinces?.name_ar || ''}","${d.commune || ''}","${d.company_name || ''}","${d.activity_nature || ''}","${d.license_status || ''}","${d.result || ''}"\n`;
+            csv += `"${d.id}","${new Date(d.created_at).toLocaleDateString('ar-MA')}","${d.regions?.name_ar || ''}","${d.provinces?.name_ar || ''}","${d.commune || ''}","${d.company_name || ''}","${d.activity_nature || ''}","${d.license_status || ''}","${d.result || ''}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -271,7 +274,6 @@
 
     initNationalPanel();
 
-    // التحديث الفوري
     supabaseClient
         .channel('public:national-master-portal')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchNationalData())
