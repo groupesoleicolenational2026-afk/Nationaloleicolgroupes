@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول المشرفين - قطاع زيت الزيتون</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
+        h2 { text-align: center; color: #1e3d59; margin-bottom: 25px; font-size: 22px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
+        select, input[type="password"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        select:focus, input[type="password"]:focus { border-color: #3b82f6; outline: none; }
+        button { background: #059669; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
+        button:hover { background: #047857; }
+        .error-msg { color: #dc2626; text-align: center; margin-top: 15px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>بوابة المشرفين</h2>
+    <div class="form-group">
+        <label for="admin-region">اختر الجهة أو نوع الإشراف:</label>
+        <select id="admin-region">
+            <option value="">-- اختر الجهة --</option>
+            <option value="1">جهة مراكش آسفي</option>
+            <option value="2">جهة بني ملال خنيفرة</option>
+            <option value="3">جهة فاس مكناس</option>
+            <option value="4">جهة الشرق</option>
+            <option value="5">جهة طنجة تطوان الحسيمة</option>
+            <option value="all">المشرف العام (كل الجهات)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="admin-pass">كلمة المرور:</label>
+        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور السرية">
+    </div>
+
+    <button onclick="loginAdmin()">دخول للوحة التحكم</button>
+    <div id="error-msg" class="error-msg">الجهة أو كلمة المرور غير صحيحة!</div>
+</div>
+
+<script>
+    function loginAdmin() {
+        const region = document.getElementById('admin-region').value;
+        const pass = document.getElementById('admin-pass').value;
+        const errorDiv = document.getElementById('error-msg');
+
+        // يمكنك تخصيص كلمات مرور لكل جهة أو كلمة مرور موحدة للإشراف
+        if (pass === "OliveAdmin2026") {
+            if (region === "all") {
+                // توجيه المشرف العام إلى لوحة الإشراف الشاملة
+                window.location.href = "super-admin.html";
+            } else if (region) {
+                // توجيه مشرف الجهة إلى لوحته مع تمرير رقم الجهة في الرابط
+                window.location.href = `regional-admin.html?region=${region}`;
+            } else {
+                errorDiv.textContent = "الرجاء اختيار الجهة أولاً";
+                errorDiv.style.display = "block";
+            }
+        } else {
+            errorDiv.textContent = "كلمة المرور غير صحيحة";
+            errorDiv.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
