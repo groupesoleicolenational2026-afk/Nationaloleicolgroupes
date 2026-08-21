@@ -5,40 +5,71 @@
     <title>لوحة الإشراف الوطني الشامل | قطاع زيت الزيتون</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        :root { --olive-dark: #2d3b2a; --olive-light: #556b2f; --gold: #c5a059; --cream: #f4f6f0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--cream); padding: 20px; color: #333; margin: 0; }
         .container { max-width: 1300px; margin: auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .back-btn { background: #64748b; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .back-btn:hover { background: #475569; }
         .header-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        
+        /* صندوق تنبيهات طلبات الحذف الواردة للمشرف العام */
+        .requests-box { background: #fffbeb; border: 2px solid #f59e0b; padding: 20px; border-radius: 15px; margin-bottom: 25px; }
+        .request-item { background: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; border-right: 4px solid #d97706; }
+        
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
-        th { background: #1e293b; color: white; padding: 15px; text-align: right; }
+        th { background: var(--olive-dark); color: white; padding: 15px; text-align: right; }
         td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; }
-        .export-btn { background: #059669; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.3s; }
+        .export-btn { background: #059669; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; font-family: 'Cairo', sans-serif; }
         .export-btn:hover { background: #047857; }
+        .delete-btn { background: #dc2626; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; font-family: 'Cairo', sans-serif; }
+        .delete-btn:hover { background: #b91c1c; }
+        .approve-btn { background: #16a34a; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .approve-btn:hover { background: #15803d; }
+        .reject-btn { background: #ca8a04; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .reject-btn:hover { background: #a16207; }
+        
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .status-success { background: #dcfce7; color: #166534; }
         .status-danger { background: #fee2e2; color: #991b1b; }
         .filter-box { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        select { padding: 10px 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Cairo', sans-serif; font-size: 15px; }
+        select, input[type="text"] { padding: 10px 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Cairo', sans-serif; font-size: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="top-bar">
+        <a href="admin-master.html" class="back-btn">← رجوع لبوابة المشرف العام</a>
+    </div>
+
     <div class="header-box">
         <div>
-            <h1 style="color: #1e293b; margin: 0 0 5px 0;">🌐 لوحة الإشراف الوطني الشامل</h1>
-            <p style="color: #666; margin: 0;">متابعة الجداول الجهوية والوطنية وتصدير البيانات للمشرف العام حصرياً</p>
+            <h1 style="color: var(--olive-dark); margin: 0 0 5px 0;">🌐 لوحة الإشراف الوطني الشامل</h1>
+            <p style="color: #666; margin: 0;">إدارة البيانات، وتدبير طلبات الحذف الواردة من المشرفين الجهويين</p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="export-btn" onclick="exportCurrentViewCSV()">📥 تنزيل الجدول المعروض حالياً</button>
             <button class="export-btn" style="background: #1e3d59;" onclick="exportNationalCSV()">📥 تنزيل كل الجهات (وطني)</button>
         </div>
     </div>
 
-    <!-- لوحة التصفية والتحكم -->
+    <!-- قسم تنبيهات طلبات الحذف الواردة من الجهات -->
+    <div class="requests-box">
+        <h3 style="margin-top: 0; color: #b45309; display: flex; align-items: center; gap: 8px;">
+            📥 طلبات الحذف الواردة من المشرفين الجهويين 
+            <span id="requestsCountBadge" style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px;">0</span>
+        </h3>
+        <div id="deleteRequestsContainer">
+            <p style="color: #666; margin: 0; font-size: 14px;">لا توجد طلبات حذف معلقة في الوقت الحالي.</p>
+        </div>
+    </div>
+
+    <!-- لوحة التصفية وعرض الجداول -->
     <div class="card">
         <div class="filter-box">
-            <label style="font-weight: bold; font-size: 16px;">اختر الجهة للعرض والتنزيل:</label>
+            <label style="font-weight: bold; font-size: 16px;">تصفية الجدول حسب الجهة:</label>
             <select id="regionFilter" onchange="filterNationalData()">
                 <option value="all">🌐 جميع الجهات (الجدول الوطني العام)</option>
                 <option value="1">جهة مراكش آسفي</option>
@@ -62,10 +93,11 @@
                     <th>طبيعة النشاط</th>
                     <th>الترخيص الصحي</th>
                     <th>الوضعية</th>
+                    <th>صلاحيات المشرف العام</th>
                 </tr>
             </thead>
             <tbody id="nationalTableBody">
-                <tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
+                <tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">جاري تحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
@@ -79,31 +111,119 @@
     let allNationalData = [];
     let currentFilteredData = [];
 
+    async function initNationalPanel() {
+        await fetchNationalData();
+        await fetchDeleteRequests();
+    }
+
     async function fetchNationalData() {
         const { data, error } = await supabaseClient
             .from('submissions')
-            .select(`
-                *,
-                regions (id, name_ar),
-                provinces (name_ar)
-            `)
+            .select(`*, regions (id, name_ar), provinces (name_ar)`)
             .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('خطأ في جلب البيانات:', error);
+        if (!error) {
+            allNationalData = data;
+            currentFilteredData = data;
+            renderNationalTable(data);
+        }
+    }
+
+    // جلب طلبات الحذف المعلقة
+    async function fetchDeleteRequests() {
+        const { data, error } = await supabaseClient
+            .from('delete_requests')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (!error) {
+            renderDeleteRequests(data);
+        }
+    }
+
+    function renderDeleteRequests(requests) {
+        const container = document.getElementById('deleteRequestsContainer');
+        const badge = document.getElementById('requestsCountBadge');
+        
+        badge.textContent = requests.length;
+
+        if (!requests || requests.length === 0) {
+            container.innerHTML = `<p style="color: #666; margin: 0; font-size: 14px;">لا توجد طلبات حذف معلقة في الوقت الحالي.</p>`;
             return;
         }
 
-        allNationalData = data;
-        currentFilteredData = data; // افتراضياً الكل معروض
-        renderNationalTable(data);
+        container.innerHTML = requests.map(req => `
+            <div class="request-item">
+                <div>
+                    <strong>الجهة:</strong> ${req.region_name} | 
+                    <strong>المعصرة:</strong> ${req.company_name} <br>
+                    <span style="color: #b45309; font-size: 13px;"><strong>السبب:</strong> ${req.reason}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="approve-btn" onclick="approveDelete('${req.id}', '${req.submission_id}')">موافقة وحذف السجل</button>
+                    <button class="reject-btn" onclick="rejectDelete('${req.id}')">رفض الطلب</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // موافقة المشرف العام وحذف السجل نهائياً من قاعدة البيانات وإزالة طلب الحذف
+    async function approveDelete(requestId, submissionId) {
+        if (!confirm('هل أنت متأكد من الموافقة على الحذف النهائي لهذا السجل؟')) return;
+
+        // 1. حذف السجل الأساسي من جدول submissions
+        const { error: err1 } = await supabaseClient
+            .from('submissions')
+            .delete()
+            .eq('id', submissionId);
+
+        // 2. حذف الطلب من جدول delete_requests
+        const { error: err2 } = await supabaseClient
+            .from('delete_requests')
+            .delete()
+            .eq('id', requestId);
+
+        if (err1 || err2) {
+            alert('حدث خطأ أثناء إتمام عملية الحذف.');
+        } else {
+            alert('تم قبول طلب الحذف وحذف المعصرة بنجاح.');
+            initNationalPanel();
+        }
+    }
+
+    // رفض طلب الحذف وحذفه من قائمة التنبيهات فقط
+    async function rejectDelete(requestId) {
+        if (!confirm('هل تريد رفض طلب الحذف؟')) return;
+
+        const { error } = await supabaseClient
+            .from('delete_requests')
+            .delete()
+            .eq('id', requestId);
+
+        if (!error) {
+            alert('تم رفض طلب الحذف.');
+            fetchDeleteRequests();
+        }
+    }
+
+    async function deleteSubmissionMaster(id) {
+        if (!confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا التسجيل نهائياً؟')) return;
+        
+        const { error } = await supabaseClient
+            .from('submissions')
+            .delete()
+            .eq('id', Number(id));
+
+        if (!error) {
+            alert('تم الحذف بنجاح.');
+            fetchNationalData();
+        }
     }
 
     function renderNationalTable(data) {
         const tbody = document.getElementById('nationalTableBody');
-        
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة لهذه الجهة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">لا توجد أي طلبات مسجلة حتى الآن.</td></tr>`;
             return;
         }
 
@@ -116,11 +236,13 @@
                 <td>${d.activity_nature || '-'}</td>
                 <td>${d.license_status || '-'}</td>
                 <td><span class="badge ${d.result && d.result.includes('قبول') ? 'status-success' : 'status-danger'}">${d.result || '-'}</span></td>
+                <td>
+                    <button class="delete-btn" onclick="deleteSubmissionMaster('${d.id}')">حذف نهائي</button>
+                </td>
             </tr>
         `).join('');
     }
 
-    // تصفية الجدول حسب الجهة المختارة
     function filterNationalData() {
         const selectedVal = document.getElementById('regionFilter').value;
         if (selectedVal === 'all') {
@@ -131,28 +253,15 @@
         renderNationalTable(currentFilteredData);
     }
 
-    // دالة عامة لتصدير أي مجموعة بيانات إلى ملف CSV
     function downloadCSV(dataToExport, filename) {
         if (!dataToExport || dataToExport.length === 0) {
-            alert('لا توجد بيانات لتنزيلها في هذا الجدول.');
+            alert('لا توجد بيانات لتنزيلها.');
             return;
         }
-
         let csv = '\uFEFFتاريخ الإنضمام,الجهة,الإقليم,الجماعة,التسمية التجارية,طبيعة النشاط,الترخيص الصحي,الوضعية\n';
-
         dataToExport.forEach(d => {
-            const date = new Date(d.created_at).toLocaleDateString('ar-MA');
-            const region = d.regions?.name_ar || '';
-            const province = d.provinces?.name_ar || '';
-            const commune = d.commune || '';
-            const company = d.company_name || '';
-            const activity = d.activity_nature || '';
-            const license = d.license_status || '';
-            const result = d.result || '';
-
-            csv += `"${date}","${region}","${province}","${commune}","${company}","${activity}","${license}","${result}"\n`;
+            csv += `"${new Date(d.created_at).toLocaleDateString('ar-MA')}","${d.regions?.name_ar || ''}","${d.provinces?.name_ar || ''}","${d.commune || ''}","${d.company_name || ''}","${d.activity_nature || ''}","${d.license_status || ''}","${d.result || ''}"\n`;
         });
-
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -163,26 +272,22 @@
         document.body.removeChild(a);
     }
 
-    // تنزيل الجدول المعروض حالياً (سواء جهة واحدة محددة أو الكل)
     function exportCurrentViewCSV() {
         const selectElement = document.getElementById('regionFilter');
-        const selectedText = selectElement.options[selectElement.selectedIndex].text.replace(/[^\w\sarabic]/gi, '').trim();
-        downloadCSV(currentFilteredData, `Report_${selectedText}_${new Date().toISOString().slice(0,10)}.csv`);
+        downloadCSV(currentFilteredData, `Report_${new Date().toISOString().slice(0,10)}.csv`);
     }
 
-    // تنزيل التقرير الوطني الشامل بغض النظر عن الفلتر
     function exportNationalCSV() {
         downloadCSV(allNationalData, `National_Olive_Report_All_Regions_${new Date().toISOString().slice(0,10)}.csv`);
     }
 
-    fetchNationalData();
+    initNationalPanel();
 
-    // التحديث الفوري للبيانات
+    // التحديث الفوري (Realtime) للبيانات وطلبات الحذف
     supabaseClient
-        .channel('public:national-submissions')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, payload => {
-            fetchNationalData();
-        })
+        .channel('public:national-master-portal')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchNationalData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'delete_requests' }, () => fetchDeleteRequests())
         .subscribe();
 </script>
 </body>
