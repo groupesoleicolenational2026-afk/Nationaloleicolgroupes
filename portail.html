@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الإدارة المركزية والجهوية | المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --olive-dark: #2d3b2a; 
+            --olive-light: #556b2f; 
+            --gold: #c5a059; 
+            --cream: #f4f6f0; 
+        }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            background: linear-gradient(135deg, rgba(45, 59, 42, 0.85), rgba(85, 107, 47, 0.8)), 
+                        url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.96); 
+            padding: 40px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
+            text-align: center; 
+            width: 100%; 
+            max-width: 480px; 
+            border: 2px solid var(--gold);
+            box-sizing: border-box;
+        }
+        .logo { width: 130px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.25rem; line-height: 1.5; font-weight: 700; }
+        p { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; }
+        .portal-btn { 
+            background: var(--olive-dark); 
+            color: white; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: 'Cairo', sans-serif;
+        }
+        .portal-btn:hover { 
+            background: var(--gold); 
+            transform: translateY(-2px); 
+            filter: brightness(1.1);
+        }
+        .portal-btn.regional {
+            background: #3b82f6;
+        }
+        .portal-btn.regional:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img src="logo.png" alt="شعار المجموعة" class="logo">
+    <h2>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</h2>
+    <p>يرجى اختيار بوابة الدخول المناسبة لصلاحياتك</p>
+
+    <div class="btn-group">
+        <!-- زر التحويل إلى بوابة المشرف العام -->
+        <a href="admin-master.html" class="portal-btn">🌐 بوابة الإشراف العام (الرئيسية)</a>
+        
+        <!-- زر التحويل إلى بوابة المشرفين الجهويين -->
+        <a href="login.html" class="portal-btn regional">👤 بوابة المشرفين الجهويين</a>
+    </div>
+</div>
+
+</body>
+</html>
