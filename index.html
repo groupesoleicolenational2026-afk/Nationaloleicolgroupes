@@ -133,7 +133,6 @@
             const option = document.createElement('option');
             option.value = region.id;
             option.textContent = region.name_ar;
-            // تخزين رابط الواتساب الخاص بكل جهة
             option.setAttribute('data-whatsapp', region.whatsapp_link || '#');
             regionSelect.appendChild(option);
         });
@@ -171,7 +170,6 @@
         });
     });
 
-    // استدعاء دالة تحميل الجهات عند فتح الصفحة
     loadRegions();
 
     const form = document.getElementById('verificationForm');
@@ -182,14 +180,13 @@
 
         const regionId = document.getElementById('region').value;
         const provinceId = document.getElementById('province').value;
-        const communeText = document.getElementById('commune').value;
+        const communeText = document.getElementById('commune').value.trim();
         
-        // سحب رابط الواتساب الخاص بالجهة المختارة تلقائياً
         const regionSelect = document.getElementById('region');
         const selectedOption = regionSelect.options[regionSelect.selectedIndex];
         const whatsappLink = selectedOption?.getAttribute('data-whatsapp') || "#";
         
-        const companyName = document.getElementById('companyName').value;
+        const companyNameInput = document.getElementById('companyName').value.trim();
         const activityNature = document.getElementById('activityNature').value;
         const license = document.getElementById('license').value;
         const declaration = document.getElementById('declaration').checked;
@@ -198,6 +195,28 @@
         
         if (selectedUnits.length === 0) {
             alert('الرجاء اختيار نوع وحدة واحد على الأقل.');
+            return;
+        }
+
+        // 🛑 التحقق من التكرار الدقيق بناءً على تطابق (الاسم التجاري + الإقليم + الجماعة)
+        const { data: duplicateCheck, error: checkError } = await supabaseClient
+            .from('submissions')
+            .select('id')
+            .eq('province_id', provinceId)
+            .ilike('commune', communeText)
+            .ilike('company_name', companyNameInput);
+
+        if (checkError) {
+            console.error('خطأ أثناء التحقق من التكرار:', checkError);
+        } else if (duplicateCheck && duplicateCheck.length > 0) {
+            // إذا وجد تطابق تام في نفس الإقليم ونفس الجماعة ونفس التسمية التجارية
+            form.style.display = 'none';
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `<div class="danger">
+                <h3>🔴 عذراً، تم رفض طلب الانضمام (طلب مكرر)</h3>
+                <p>توجد وحدة مسجلة مسبقاً بنفس التسمية التجارية (<strong>"${companyNameInput}"</strong>) داخل نفس الجماعة والإقليم. لا يمكن قبول طلبات انضمام مكررة لنفس الوحدة.</p>
+            </div>`;
+            resultBox.scrollIntoView({ behavior: 'smooth' });
             return;
         }
         
@@ -231,7 +250,7 @@
             region_id: regionId,
             province_id: provinceId,
             commune: communeText,
-            company_name: companyName,
+            company_name: companyNameInput,
             activity_nature: activityNature,
             unit_types: selectedUnits,
             license_status: license,
