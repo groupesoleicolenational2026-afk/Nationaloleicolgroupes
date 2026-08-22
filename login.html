@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل دخول المشرفين الجهويين - المجموعات الجهوية لأرباب المعاصر وتسويق زيت الزيتون</title>
+    <title>بوابة المشرفين الجهويين | قطاع زيت الزيتون</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
             --olive-dark: #2d3b2a; 
@@ -25,100 +26,85 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        .login-card { 
+        .card { 
             background: rgba(255, 255, 255, 0.96); 
-            padding: 40px; 
+            padding: 35px; 
             border-radius: 25px; 
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
+            text-align: center; 
             width: 100%; 
-            max-width: 440px; 
-            box-sizing: border-box;
+            max-width: 450px; 
             border: 2px solid var(--gold);
-            text-align: center;
+            box-sizing: border-box;
         }
         .logo { width: 120px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.25rem; line-height: 1.5; font-weight: 700; }
-        p { color: #666; margin-bottom: 25px; font-size: 14px; }
-        .form-group { margin-bottom: 20px; text-align: right; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; font-size: 14px; }
-        select, input[type="password"] { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; outline: none; transition: border-color 0.3s; background: #fff; }
-        select:focus, input[type="password"]:focus { border-color: var(--olive-light); }
-        button { background: var(--olive-dark); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; padding: 14px; border-radius: 12px; font-size: 16px; width: 100%; font-family: 'Cairo', sans-serif; transition: background 0.3s, transform 0.2s; }
+        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.2rem; line-height: 1.5; font-weight: 700; }
+        p { color: #666; margin-bottom: 20px; font-size: 14px; }
+        select, input[type="password"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; font-family: 'Cairo', sans-serif; outline: none; background: #fff; }
+        select:focus, input:focus { border-color: var(--olive-light); }
+        button { background: var(--olive-dark); color: white; padding: 12px 30px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; font-family: 'Cairo', sans-serif; font-size: 16px; width: 100%; margin-top: 10px; }
         button:hover { background: var(--gold); transform: scale(1.02); }
         .error-msg { color: #dc2626; text-align: center; margin-top: 15px; font-size: 14px; display: none; font-weight: bold; background: #fee2e2; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
+<div class="card">
     <img src="logo.png" alt="شعار المجموعة" class="logo">
-    <h2>المجموعات الجهوية لأرباب المعاصر وتسويق زيت الزيتون</h2>
-    <p>بوابة تسجيل دخول المشرفين الجهويين</p>
+    <h2>بوابة المشرفين الجهويين</h2>
+    <p>اختر جهتك وأدخل كلمة المرور الخاصة بالإدارة الجهوية</p>
+    
+    <select id="regionSelect">
+        <option value="">-- اختر الجهة --</option>
+        <option value="1">جهة مراكش آسفي</option>
+        <option value="2">جهة بني ملال خنيفرة</option>
+        <option value="3">جهة فاس مكناس</option>
+        <option value="4">جهة الشرق</option>
+        <option value="5">جهة طنجة تطوان الحسيمة</option>
+    </select>
 
-    <div class="form-group">
-        <label for="admin-region">اختر الجهة:</label>
-        <select id="admin-region">
-            <option value="">-- اختر الجهة التابعة لك --</option>
-            <option value="marrakech">جهة مراكش آسفي</option>
-            <option value="bnimellal">جهة بني ملال خنيفرة</option>
-            <option value="fes">جهة فاس مكناس</option>
-            <option value="cherk">جهة الشرق</option>
-            <option value="tanger">جهة طنجة تطوان الحسيمة</option>
-        </select>
-    </div>
+    <input type="password" id="regionPassword" placeholder="كلمة المرور الجهوية...">
+    <button onclick="loginRegionalAdmin()">تسجيل الدخول للجهة</button>
+    <div id="error-msg" class="error-msg">كلمة المرور الجهوية غير صحيحة!</div>
 
-    <div class="form-group">
-        <label for="admin-pass">كلمة المرور الخاصة بالجهة:</label>
-        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور السرية للجهة">
-    </div>
-
-    <button onclick="loginRegionalAdmin()">دخول لوحة الجهة</button>
-    <div id="error-msg" class="error-msg">الجهة المختارة أو كلمة المرور غير صحيحة!</div>
+    <!-- زر الرجوع للواجهة الرئيسية (Portail) -->
+    <a href="portail.html" style="display: block; margin-top: 20px; color: #475569; text-decoration: none; font-size: 14px; font-weight: bold;">← العودة للواجهة الرئيسية (Portail)</a>
 </div>
 
 <script>
+    // كلمة المرور الموحدة أو المخصصة لكل جهة حسب رغبتك الأصلية
     function loginRegionalAdmin() {
-        const region = document.getElementById('admin-region').value;
-        const pass = document.getElementById('admin-pass').value;
+        const regionId = document.getElementById('regionSelect').value;
+        const pass = document.getElementById('regionPassword').value;
         const errorDiv = document.getElementById('error-msg');
-
         errorDiv.style.display = "none";
 
-        if (!region) {
-            errorDiv.textContent = "الرجاء اختيار الجهة أولاً";
-            errorDiv.style.display = "block";
+        if (!regionId) {
+            alert('الرجاء اختيار الجهة أولاً.');
             return;
         }
 
-        let targetPage = "";
-        let correctPassword = "";
+        // تحقق بسيط أو توجيه لصفحة الجهة الخاصة بناءً على الاختيار
+        if (pass === "123456") {
+            sessionStorage.setItem('userRole', 'regional');
+            sessionStorage.setItem('regionId', regionId);
 
-        // مطابقة الأسماء حرفياً مع ملفات GitHub الخاصة بك
-        if (region === "marrakech") {
-            targetPage = "admin-marrakech.html";
-            correctPassword = "Marrakech2026"; 
-        } else if (region === "bnimellal") {
-            targetPage = "admin-bnimellal.html";
-            correctPassword = "Bnimellal2026"; 
-        } else if (region === "fes") {
-            targetPage = "admin-fes.html";
-            correctPassword = "Fes2026"; 
-        } else if (region === "cherk") {
-            targetPage = "admin-cherk.html";
-            correctPassword = "Cherk2026"; 
-        } else if (region === "tanger") {
-            targetPage = "admin-tanger.html";
-            correctPassword = "Tanger2026"; 
-        }
+            // توجيه لملف الجهة المطابق
+            const regionPages = {
+                '1': 'admin-marrakech.html',
+                '2': 'admin-bnimellal.html',
+                '3': 'admin-fes.html',
+                '4': 'admin-cherk.html',
+                '5': 'admin-tanger.html'
+            };
 
-        if (pass === correctPassword) {
-            window.location.href = targetPage;
+            if (regionPages[regionId]) {
+                window.location.href = regionPages[regionId];
+            }
         } else {
-            errorDiv.textContent = "كلمة المرور غير صحيحة لهذه الجهة";
             errorDiv.style.display = "block";
         }
     }
 </script>
-
 </body>
 </html>
