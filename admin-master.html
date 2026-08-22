@@ -87,17 +87,17 @@
 
     <div class="grid">
         <!-- زر اللوحة الوطنية الشاملة (تنزيل الجداول) -->
-        <a href="admin-national.html" class="btn" style="background: #059669; margin-bottom: 5px;">📥 لوحة الإشراف الوطني الشامل وجداول التنزيل</a>
+        <a href="admin-national.html" class="btn" style="background: #059669; margin-bottom: 5px;" onclick="sessionStorage.setItem('userRole', 'master')">📥 لوحة الإشراف الوطني الشامل وجداول التنزيل</a>
         
         <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 10px 0;">
         <p style="font-size: 13px; color: #666; margin: 0 0 5px 0; text-align: center;">لوحات المتابعة والحذف الموضعي لكل جهة:</p>
 
-        <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة -->
-        <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;">متابعة جهة مراكش آسفي</a>
-        <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;">متابعة جهة بني ملال خنيفرة</a>
-        <a href="admin-fes.html" class="btn" style="background: #7a8b75;">متابعة جهة فاس مكناس</a>
-        <a href="admin-cherk.html" class="btn" style="background: #a5b4a3;">متابعة جهة الشرق</a>
-        <a href="admin-tanger.html" class="btn" style="background: #c5a059;">متابعة جهة طنجة تطوان الحسيمة</a>
+        <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة (مع حفظ الصلاحية للرجوع الذكي) -->
+        <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة مراكش آسفي</a>
+        <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة بني ملال خنيفرة</a>
+        <a href="admin-fes.html" class="btn" style="background: #7a8b75;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة فاس مكناس</a>
+        <a href="admin-cherk.html" class="btn" style="background: #a5b4a3;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة الشرق</a>
+        <a href="admin-tanger.html" class="btn" style="background: #c5a059;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة طنجة تطوان الحسيمة</a>
     </div>
 </div>
 
