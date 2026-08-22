@@ -93,16 +93,16 @@
         await fetchData();
     }
 
-    // دالة الرجوع الذكية: إذا دخل المشرف العام تعيده لـ master.html وإذا دخل الجهوي تعيده لـ login.html
-        function goBackSmartly() {
+    // دالة الرجوع الذكية: توجيه المشرف العام إلى admin-master.html والمشرف الجهوي إلى login.html
+    function goBackSmartly() {
         const userRole = sessionStorage.getItem('userRole');
         if (userRole === 'master') {
-            window.location.href = 'admin-master.html'; // الاسم الصحيح لملف المشرف العام
+            window.location.href = 'admin-master.html'; // العودة المباشرة إلى لوحة الإدارة المركزية
         } else {
-            window.location.href = 'login.html';
+            window.location.href = 'login.html'; // العودة لصفحة تسجيل الدخول للمشرف الجهوي
         }
     }
-    
+
     async function fetchData() {
         const { data, error } = await supabaseClient
             .from('submissions')
