@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الإدارة المركزية والجهوية | المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</title>
+    <title>البوابة الرئيسية | المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -27,43 +27,42 @@
         }
         .card { 
             background: rgba(255, 255, 255, 0.96); 
-            padding: 40px; 
+            padding: 40px 30px; 
             border-radius: 25px; 
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
             text-align: center; 
             width: 100%; 
-            max-width: 480px; 
+            max-width: 550px; 
             border: 2px solid var(--gold);
             box-sizing: border-box;
         }
-        .logo { width: 130px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.25rem; line-height: 1.5; font-weight: 700; }
+        .logo { width: 120px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: var(--olive-dark); margin: 5px 0 10px 0; font-size: 1.3rem; line-height: 1.5; font-weight: 700; }
         p { color: #666; margin-bottom: 30px; font-size: 14px; }
-        .btn-group { display: flex; flex-direction: column; gap: 15px; }
-        .portal-btn { 
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .btn { 
             background: var(--olive-dark); 
             color: white; 
-            padding: 15px; 
-            border: none; 
+            padding: 15px 20px; 
             border-radius: 12px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
             text-decoration: none; 
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            font-family: 'Cairo', sans-serif;
+            font-weight: bold; 
+            transition: 0.3s; 
+            display: block; 
+            text-align: center; 
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .portal-btn:hover { 
+        .btn:hover { 
             background: var(--gold); 
             transform: translateY(-2px); 
-            filter: brightness(1.1);
+            filter: brightness(1.05); 
         }
-        .portal-btn.regional {
-            background: #3b82f6;
+        .btn-secondary {
+            background: #475569;
         }
-        .portal-btn.regional:hover {
-            background: #2563eb;
+        .btn-secondary:hover {
+            background: #334155;
         }
     </style>
 </head>
@@ -72,14 +71,14 @@
 <div class="card">
     <img src="logo.png" alt="شعار المجموعة" class="logo">
     <h2>المجموعة الوطنية لأرباب المعاصر وتسويق زيت الزيتون</h2>
-    <p>يرجى اختيار بوابة الدخول المناسبة لصلاحياتك</p>
+    <p>الواجهة الرقمية الرسمية - اختر البوابة المناسبة للمتابعة:</p>
 
-    <div class="btn-group">
-        <!-- زر التحويل إلى بوابة المشرف العام -->
-        <a href="admin-master.html" class="portal-btn">🌐 بوابة الإشراف العام (الرئيسية)</a>
+    <div class="grid">
+        <!-- زر بوابة الإشراف العام -->
+        <a href="admin-master.html" class="btn">🛡️ بوابة الإشراف العام والإدارة المركزية</a>
         
-        <!-- زر التحويل إلى بوابة المشرفين الجهويين -->
-        <a href="login.html" class="portal-btn regional">👤 بوابة المشرفين الجهويين</a>
+        <!-- زر بوابة المشرفين الجهويين -->
+        <a href="login.html" class="btn btn-secondary">🌐 بوابة المشرفين الجهويين</a>
     </div>
 </div>
 
