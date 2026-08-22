@@ -28,12 +28,24 @@
         .request-delete-btn { background: #d97706; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: background 0.3s; font-family: 'Cairo', sans-serif; font-weight: bold; }
         .request-delete-btn:hover { background: #b45309; }
         .requested-badge { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; }
+
+        /* تنسيق نافذة الحذف التفاعلية (Modal) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-card { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: right; border-top: 5px solid #d97706; }
+        .modal-card h3 { margin-top: 0; color: var(--olive-dark); }
+        .modal-card label { display: block; margin: 12px 0 5px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .modal-card textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 8px; font-family: 'Cairo', sans-serif; display: none; resize: vertical; box-sizing: border-box; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .modal-btn-confirm { background: #d97706; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .modal-btn-confirm:hover { background: #b45309; }
+        .modal-btn-cancel { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .modal-btn-cancel:hover { background: #475569; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- شريط التنقل العلوي الهرمي (زر الرجوع الذكي + زر تسجيل الخروج المستقل) -->
+    <!-- شريط التنقل العلوي الهرمي -->
     <div class="top-bar-nav">
         <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="goBackSmartly()" class="nav-btn">← رجوع</button>
@@ -78,6 +90,36 @@
     </div>
 </div>
 
+<!-- نافذة منبثقة تفاعلية (Modal) لاختيار سبب الحذف -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 id="modalTitle">طلب حذف المعصرة</h3>
+        <p id="modalSubtitle" style="font-size: 13px; color: #666; margin-bottom: 15px;"></p>
+        
+        <form id="deleteReasonForm" onsubmit="submitDeletionRequest(event)">
+            <label>
+                <input type="radio" name="deleteReason" value="لا ينتمي إلى الجهة" required onclick="toggleCustomReason(false)">
+                لا ينتمي إلى الجهة
+            </label>
+            <label>
+                <input type="radio" name="deleteReason" value="طلب انضمام مكرر" onclick="toggleCustomReason(false)">
+                طلب انضمام مكرر
+            </label>
+            <label>
+                <input type="radio" name="deleteReason" value="أخرى" onclick="toggleCustomReason(true)">
+                أخرى (ذكر السبب بالتفصيل)
+            </label>
+            
+            <textarea id="customReasonText" placeholder="اكتب السبب بالتفصيل هنا..."></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="modal-btn-cancel" onclick="closeDeleteModal()">إلغاء</button>
+                <button type="submit" class="modal-btn-confirm">إرسال طلب الحذف</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
@@ -88,16 +130,17 @@
 
     let provincesChartInstance = null;
     let statusChartInstance = null;
+    let activeRecordId = null; // الاحتفاظ بمعرف السجل الحالي المراد حذفه
 
     async function initDashboard() {
         await fetchData();
     }
 
-    // دالة الرجوع الذكية: توجيه المشرف العام إلى admin-master.html والمشرف الجهوي إلى login.html
+    // دالة الرجوع الذكية
     function goBackSmartly() {
         const userRole = sessionStorage.getItem('userRole');
         if (userRole === 'master') {
-            sessionStorage.setItem('skipMasterLogin', 'true'); // تفعيل أمر فتح لوحة الإدارة المركزية مباشرة
+            sessionStorage.setItem('skipMasterLogin', 'true');
             window.location.href = 'admin-master.html';
         } else {
             window.location.href = 'login.html';
@@ -120,37 +163,51 @@
         renderCharts(data);
     }
 
-    // طلب الحذف مع الخيارات المحددة (لا ينتمي للجهة، انضمام مكرر، أو أخرى مع ذكر السبب)
-    async function requestDelete(recordId, companyName) {
-        const optionsText = 
-            "المرجوا اختيار سبب طلب الحذف:\n" +
-            "1 - لا ينتمي إلى الجهة\n" +
-            "2 - طلب انضمام مكرر\n" +
-            "3 - أخرى (ذكر السبب بالتفصيل)";
-            
-        const choice = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\n\n${optionsText}\n\nأدخل رقم الخيار (1 أو 2 أو 3):`);
-        
-        if (!choice) {
-            alert("تم إلغاء الطلب.");
-            return;
+    // فتح نافذة طلب الحذف التفاعلية
+    function requestDelete(recordId, companyName) {
+        activeRecordId = recordId;
+        document.getElementById('modalTitle').textContent = `طلب حذف: ${companyName}`;
+        document.getElementById('modalSubtitle').textContent = `الرقم التعريفي (ID): #${recordId}`;
+        document.getElementById('deleteReasonForm').reset();
+        document.getElementById('customReasonText').style.display = 'none';
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    // إغلاق النافذة
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        activeRecordId = null;
+    }
+
+    // التحكم في ظهور خانة النص عند اختيار "أخرى"
+    function toggleCustomReason(show) {
+        const textarea = document.getElementById('customReasonText');
+        if (show) {
+            textarea.style.display = 'block';
+            textarea.required = true;
+        } else {
+            textarea.style.display = 'none';
+            textarea.required = false;
+            textarea.value = '';
         }
+    }
 
-        let finalReason = "";
+    // إرسال طلب الحذف الفعلي لقاعدة البيانات
+    async function submitDeletionRequest(event) {
+        event.preventDefault();
+        if (!activeRecordId) return;
 
-        if (choice.trim() === "1") {
-            finalReason = "لا ينتمي إلى الجهة";
-        } else if (choice.trim() === "2") {
-            finalReason = "طلب انضمام مكرر";
-        } else if (choice.trim() === "3") {
-            const customReason = prompt("المرجو كتابة السبب بالتفصيل:");
-            if (!customReason || customReason.trim() === "") {
-                alert("تم إلغاء الطلب. يجب إدخال السبب في خيار أخرى.");
+        const selectedRadio = document.querySelector('input[name="deleteReason"]:checked');
+        if (!selectedRadio) return;
+
+        let finalReason = selectedRadio.value;
+        if (finalReason === 'أخرى') {
+            const customText = document.getElementById('customReasonText').value.trim();
+            if (!customText) {
+                alert('المرجو كتابة السبب بالتفصيل.');
                 return;
             }
-            finalReason = "أخرى: " + customReason.trim();
-        } else {
-            alert("خيار غير صحيح، تم إلغاء العملية.");
-            return;
+            finalReason = 'أخرى: ' + customText;
         }
 
         const { error } = await supabaseClient
@@ -159,13 +216,14 @@
                 deletion_requested: true, 
                 deletion_reason: finalReason 
             })
-            .eq('id', Number(recordId));
+            .eq('id', Number(activeRecordId));
 
         if (error) {
             alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
             console.error(error);
         } else {
-            alert('تم إرسال طلب الحذف بنجاح مع السبب المحدد للمشرف العام. ✅');
+            alert('تم إرسال طلب الحذف بنجاح مع السبب المحدد. ✅');
+            closeDeleteModal();
             fetchData();
         }
     }
