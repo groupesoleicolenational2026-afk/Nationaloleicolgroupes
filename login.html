@@ -65,14 +65,13 @@
 
     <input type="password" id="regionPassword" placeholder="كلمة المرور الجهوية...">
     <button onclick="loginRegionalAdmin()">تسجيل الدخول للجهة</button>
-    <div id="error-msg" class="error-msg">كلمة المرور الجهوية غير صحيحة!</div>
+    <div id="error-msg" class="error-msg">كلمة المرور الجهوية غير صحيحة لهذه الجهة!</div>
 
     <!-- زر الرجوع للواجهة الرئيسية (Portail) -->
     <a href="portail.html" style="display: block; margin-top: 20px; color: #475569; text-decoration: none; font-size: 14px; font-weight: bold;">← العودة للواجهة الرئيسية (Portail)</a>
 </div>
 
 <script>
-    // كلمة المرور الموحدة أو المخصصة لكل جهة حسب رغبتك الأصلية
     function loginRegionalAdmin() {
         const regionId = document.getElementById('regionSelect').value;
         const pass = document.getElementById('regionPassword').value;
@@ -84,19 +83,28 @@
             return;
         }
 
-        // تحقق بسيط أو توجيه لصفحة الجهة الخاصة بناءً على الاختيار
-        if (pass === "123456") {
+        // خريطة كلمات المرور الخاصة بكل جهة بدقة
+        const regionPasswords = {
+            '1': 'Marrakech2026',
+            '2': 'Bnimellal2026',
+            '3': 'Fes2026',
+            '4': 'Cherk2026',
+            '5': 'Tanger2026'
+        };
+
+        // خريطة أسماء الملفات الجهوية
+        const regionPages = {
+            '1': 'admin-marrakech.html',
+            '2': 'admin-bnimellal.html',
+            '3': 'admin-fes.html',
+            '4': 'admin-cherk.html',
+            '5': 'admin-tanger.html'
+        };
+
+        // التحقق من صحة كلمة المرور المدخلة للجهة المحددة
+        if (regionPasswords[regionId] && pass === regionPasswords[regionId]) {
             sessionStorage.setItem('userRole', 'regional');
             sessionStorage.setItem('regionId', regionId);
-
-            // توجيه لملف الجهة المطابق
-            const regionPages = {
-                '1': 'admin-marrakech.html',
-                '2': 'admin-bnimellal.html',
-                '3': 'admin-fes.html',
-                '4': 'admin-cherk.html',
-                '5': 'admin-tanger.html'
-            };
 
             if (regionPages[regionId]) {
                 window.location.href = regionPages[regionId];
