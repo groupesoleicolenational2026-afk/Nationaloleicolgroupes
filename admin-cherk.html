@@ -47,7 +47,7 @@
     </div>
 
     <h1 style="color: var(--olive-dark); margin-bottom: 5px;">📊 لوحة تحكم الإدارة الجهوية</h1>
-    <p style="color: #666; margin-bottom: 25px;">متابعة طلبات المنخرطين والإحصائيات (طلبات الحذف ترفع حصرياً للمشرف العام مع ذكر السبب)</p>
+    <p style="color: #666; margin-bottom: 25px;">متابعة طلبات المنخرطين والإحصائيات (طلبات الحذف ترفع حصرياً للمشرف العام مع تحديد السبب)</p>
 
     <!-- الرسوم البيانية الإحصائية -->
     <div class="dashboard-grid">
@@ -93,7 +93,7 @@
         await fetchData();
     }
 
-    // دالة الرجوع الذكية: إذا كان المشرف العام نعطيه أمر تخطي كلمة المرور ونعيده لـ admin-master.html، وإذا كان جهوياً نعيده لـ login.html
+    // دالة الرجوع الذكية: توجيه المشرف العام إلى admin-master.html والمشرف الجهوي إلى login.html
     function goBackSmartly() {
         const userRole = sessionStorage.getItem('userRole');
         if (userRole === 'master') {
@@ -120,11 +120,36 @@
         renderCharts(data);
     }
 
+    // طلب الحذف مع الخيارات المحددة (لا ينتمي للجهة، انضمام مكرر، أو أخرى مع ذكر السبب)
     async function requestDelete(recordId, companyName) {
-        const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\nالرجاء إدخال سبب طلب الحذف:`);
+        const optionsText = 
+            "المرجوا اختيار سبب طلب الحذف:\n" +
+            "1 - لا ينتمي إلى الجهة\n" +
+            "2 - طلب انضمام مكرر\n" +
+            "3 - أخرى (ذكر السبب بالتفصيل)";
+            
+        const choice = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\n\n${optionsText}\n\nأدخل رقم الخيار (1 أو 2 أو 3):`);
         
-        if (!reason || reason.trim() === "") {
-            alert("تم إلغاء الطلب. يجب كتابة سبب الحذف.");
+        if (!choice) {
+            alert("تم إلغاء الطلب.");
+            return;
+        }
+
+        let finalReason = "";
+
+        if (choice.trim() === "1") {
+            finalReason = "لا ينتمي إلى الجهة";
+        } else if (choice.trim() === "2") {
+            finalReason = "طلب انضمام مكرر";
+        } else if (choice.trim() === "3") {
+            const customReason = prompt("المرجو كتابة السبب بالتفصيل:");
+            if (!customReason || customReason.trim() === "") {
+                alert("تم إلغاء الطلب. يجب إدخال السبب في خيار أخرى.");
+                return;
+            }
+            finalReason = "أخرى: " + customReason.trim();
+        } else {
+            alert("خيار غير صحيح، تم إلغاء العملية.");
             return;
         }
 
@@ -132,7 +157,7 @@
             .from('submissions')
             .update({ 
                 deletion_requested: true, 
-                deletion_reason: reason.trim() 
+                deletion_reason: finalReason 
             })
             .eq('id', Number(recordId));
 
@@ -140,7 +165,7 @@
             alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
             console.error(error);
         } else {
-            alert('تم إرسال طلب الحذف بنجاح مع ربطه بالرقم التعريفي للمشرف العام. ✅');
+            alert('تم إرسال طلب الحذف بنجاح مع السبب المحدد للمشرف العام. ✅');
             fetchData();
         }
     }
@@ -216,6 +241,29 @@
     }
 
     initDashboard();
+
+    // نظام الخمول التلقائي الأمني (5 دقائق)
+    let inactivityTimeout;
+    const idleLimitMinutes = 5;
+
+    function resetIdleTimer() {
+        clearTimeout(inactivityTimeout);
+        inactivityTimeout = setTimeout(logoutDueToInactivity, idleLimitMinutes * 60 * 1000);
+    }
+
+    function logoutDueToInactivity() {
+        alert('⚠️ تنبيه أمني: تم تسجيل الخروج تلقائياً بسبب عدم التفاعل لفترة طويلة حفاظاً على سرية المعطيات.');
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+    window.addEventListener('mousemove', resetIdleTimer);
+    window.addEventListener('keypress', resetIdleTimer);
+    window.addEventListener('click', resetIdleTimer);
+    window.addEventListener('scroll', resetIdleTimer);
+    window.addEventListener('touchstart', resetIdleTimer);
+
+    resetIdleTimer();
 
     supabaseClient
         .channel('public:submissions-regional')
