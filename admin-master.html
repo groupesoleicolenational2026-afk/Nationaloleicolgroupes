@@ -61,10 +61,17 @@
     <input type="password" id="password" placeholder="أدخل كلمة المرور السرية للإشراف العام">
     <button onclick="checkPassword()">دخول آمن للمشرف العام</button>
     <div id="error-msg" class="error-msg">كلمة المرور غير صحيحة!</div>
+    
+    <!-- زر الرجوع للواجهة الرئيسية (Portail) -->
+    <a href="portail.html" style="display: block; margin-top: 15px; color: #475569; text-decoration: none; font-size: 14px; font-weight: bold;">← العودة للواجهة الرئيسية (Portail)</a>
 </div>
 
 <!-- قائمة الإدارة الشاملة للمشرف العام -->
 <div class="card" id="menuBox" style="display: none; text-align: right;">
+    
+    <!-- زر قفل الجلسة والرجوع للبوابة الأمنية داخل نفس الملف -->
+    <button onclick="document.getElementById('menuBox').style.display='none'; document.getElementById('loginBox').style.display='block';" style="background: #64748b; width: auto; padding: 6px 15px; font-size: 13px; margin-bottom: 15px; cursor: pointer;">← قفل الجلسة والرجوع للبوابة</button>
+
     <h2 style="color: var(--olive-dark); font-size: 1.2rem; margin-bottom: 15px; text-align: center;">🌐 لوحة الإدارة المركزية والمشرف العام</h2>
 
     <!-- قسم تدبير وتحديث روابط الواتساب حصرياً للمشرف العام -->
@@ -173,4 +180,5 @@
     }
 </script>
 </body>
-</html>
+    </html>
+    
