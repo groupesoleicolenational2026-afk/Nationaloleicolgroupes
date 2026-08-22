@@ -92,7 +92,7 @@
         <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 10px 0;">
         <p style="font-size: 13px; color: #666; margin: 0 0 5px 0; text-align: center;">لوحات المتابعة والحذف الموضعي لكل جهة:</p>
 
-        <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة (مع حفظ الصلاحية للرجوع الذكي) -->
+        <!-- لوحات متابعة وحذف السجلات الخاصة بكل جهة -->
         <a href="admin-marrakech.html" class="btn" style="background: #3e4f3a;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة مراكش آسفي</a>
         <a href="admin-bnimellal.html" class="btn" style="background: #5d735a;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة بني ملال خنيفرة</a>
         <a href="admin-fes.html" class="btn" style="background: #7a8b75;" onclick="sessionStorage.setItem('userRole', 'master')">متابعة جهة فاس مكناس</a>
@@ -106,12 +106,12 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // التحقق عند تحميل لوحة Master إذا كان المشرف عائداً من صفحة جهوية عبر زر الرجوع الذكي
+    // التحقق التلقائي عند العودة من صفحة جهوية عبر زر الرجوع الذكي
     window.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem('skipMasterLogin') === 'true') {
-            sessionStorage.removeItem('skipMasterLogin'); // تنظيف المتغير المؤقت
+            sessionStorage.removeItem('skipMasterLogin'); // مسح المتغير المؤقت
             document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('menuBox').style.display = 'block';
+            document.getElementById('menuBox').style.display = 'block'; // فتح لوحة الإدارة المركزية مباشرة
         }
     });
 
