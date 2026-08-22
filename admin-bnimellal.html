@@ -120,16 +120,16 @@
         renderCharts(data);
     }
 
-    // طلب الحذف مع الخيارات المحددة (لا ينتمي للجهة، انضمام مكرر، أو أخرى مع ذكر السبب)
+    // طلب الحذف مع الاختيارات السريعة التلقائية
     async function requestDelete(recordId, companyName) {
-        const optionsText = 
-            "المرجوا اختيار سبب طلب الحذف:\n" +
-            "1 - لا ينتمي إلى الجهة\n" +
-            "2 - طلب انضمام مكرر\n" +
-            "3 - أخرى (ذكر السبب بالتفصيل)";
-            
-        const choice = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\n\n${optionsText}\n\nأدخل رقم الخيار (1 أو 2 أو 3):`);
-        
+        const choice = prompt(
+            `طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\n\n` +
+            `اختر سبب الحذف:\n` +
+            `1: لا ينتمي إلى الجهة\n` +
+            `2: طلب انضمام مكرر\n` +
+            `3: أخرى (ذكر السبب بالتفصيل)`
+        );
+
         if (!choice) {
             alert("تم إلغاء الطلب.");
             return;
@@ -144,7 +144,7 @@
         } else if (choice.trim() === "3") {
             const customReason = prompt("المرجو كتابة السبب بالتفصيل:");
             if (!customReason || customReason.trim() === "") {
-                alert("تم إلغاء الطلب. يجب إدخال السبب في خيار أخرى.");
+                alert("تم إلغاء الطلب. يجب كتابة السبب في خيار أخرى.");
                 return;
             }
             finalReason = "أخرى: " + customReason.trim();
@@ -165,7 +165,7 @@
             alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
             console.error(error);
         } else {
-            alert('تم إرسال طلب الحذف بنجاح مع السبب المحدد للمشرف العام. ✅');
+            alert('تم إرسال طلب الحذف بنجاح مع السبب المحدد. ✅');
             fetchData();
         }
     }
