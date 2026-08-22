@@ -94,15 +94,15 @@
     }
 
     // دالة الرجوع الذكية: إذا دخل المشرف العام تعيده لـ master.html وإذا دخل الجهوي تعيده لـ login.html
-    function goBackSmartly() {
+        function goBackSmartly() {
         const userRole = sessionStorage.getItem('userRole');
         if (userRole === 'master') {
-            window.location.href = 'master.html'; // اسم ملف المشرف العام لديك
+            window.location.href = 'admin-master.html'; // الاسم الصحيح لملف المشرف العام
         } else {
             window.location.href = 'login.html';
         }
     }
-
+    
     async function fetchData() {
         const { data, error } = await supabaseClient
             .from('submissions')
