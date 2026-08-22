@@ -95,7 +95,7 @@
         renderCharts(data);
     }
 
-    // دالة طلب الحذف المرتبطة حصرياً بالرقم التعريفي ID للمنخرط
+    // دالة طلب الحذف مع التحويل الرقمي الدقيق لمعرف السجل (Number)
     async function requestDelete(recordId, companyName) {
         const reason = prompt(`طلب حذف المعصرة: "${companyName}"\nالرقم التعريفي (ID): ${recordId}\nالرجاء إدخال سبب طلب الحذف:`);
         
@@ -110,7 +110,7 @@
                 deletion_requested: true, 
                 deletion_reason: reason.trim() 
             })
-            .eq('id', recordId); // الربط القاطع بالرقم التعريفي
+            .eq('id', Number(recordId)); // تحويل الرقم التعريفي إلى رقم صريح لضمان المطابقة في قاعدة البيانات
 
         if (error) {
             alert('حدث خطأ أثناء إرسال طلب الحذف: ' + error.message);
