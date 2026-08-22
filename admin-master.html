@@ -106,6 +106,15 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // التحقق عند تحميل لوحة Master إذا كان المشرف عائداً من صفحة جهوية عبر زر الرجوع الذكي
+    window.addEventListener('DOMContentLoaded', () => {
+        if (sessionStorage.getItem('skipMasterLogin') === 'true') {
+            sessionStorage.removeItem('skipMasterLogin'); // تنظيف المتغير المؤقت
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('menuBox').style.display = 'block';
+        }
+    });
+
     function checkPassword() {
         const pass = document.getElementById('password').value;
         const errorDiv = document.getElementById('error-msg');
