@@ -9,7 +9,7 @@
         body { font-family: 'Cairo', sans-serif; background: var(--cream); padding: 20px; color: #333; margin: 0; }
         .container { max-width: 1300px; margin: auto; }
         
-        /* شريط التنقل العلوي المحدث بزرين مستقلين للرجوع */
+        /* شريط التنقل العلوي مع الزرين المنفصلين للرجوع */
         .top-bar-nav { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .nav-btn { background: #475569; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 14px; transition: 0.3s; display: inline-block; font-family: 'Cairo', sans-serif; }
         .nav-btn:hover { background: #334155; }
@@ -20,21 +20,23 @@
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; margin-top: 10px; }
         th { background: var(--olive-dark); color: white; padding: 15px; text-align: right; }
         td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; }
+        
+        /* تنسيق خاص لتحديد الصف عند الانتقال إليه بالمعرف الرقمي */
+        .highlight-row { background-color: #fef3c7 !important; transition: background-color 1.5s ease; }
+        .jump-box { background: #eef2ff; padding: 12px 15px; border-radius: 10px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; border-right: 4px solid #4f46e5; }
+        .jump-box input { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Cairo', sans-serif; width: 200px; }
+        .jump-btn { background: #4f46e5; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .jump-btn:hover { background: #4338ca; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- شريط التنقل العلوي المحدث -->
+    <!-- شريط التنقل العلوي بالزرين المنفصلين -->
     <div class="top-bar-nav">
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <!-- زر يرجع إلى لوحة الإدارة المركزية مباشرة دون كلمة مرور -->
             <button onclick="goToMasterDashboard()" class="nav-btn">← لوحة الإدارة المركزية</button>
-            
-            <!-- زر يرجع إلى بوابة الإشراف العام (قفل الجلسة) -->
             <button onclick="goToMasterLogin()" class="nav-btn" style="background: #334155;">🔒 بوابة الإشراف العام</button>
-            
-            <!-- زر تسجيل الخروج -->
             <a href="login.html" class="nav-btn logout-btn" onclick="sessionStorage.clear()">تسجيل الخروج 🚪</a>
         </div>
         <div style="font-size: 14px; color: #64748b; font-weight: bold;">
@@ -43,9 +45,16 @@
     </div>
 
     <h1 style="color: var(--olive-dark); margin-bottom: 5px;">📥 لوحة الإشراف الوطني الشامل وجداول التنزيل</h1>
-    <p style="color: #666; margin-bottom: 25px;">عرض عام لجميع المعاصر والوحدات المسجلة على مستوى كافة الجهات والمناطق</p>
+    <p style="color: #666; margin-bottom: 20px;">عرض شامل لكافة السجلات مع إمكانية الانتقال المباشر للمعصرة عبر الرقم التعريفي (ID)</p>
 
-    <!-- محتوى الجدول والبيانات الوطني -->
+    <!-- خانة الانتقال المباشر بالمعرف الرقمي (ID) -->
+    <div class="jump-box">
+        <label for="searchIdInput" style="font-weight: bold; font-size: 14px; color: #312e81;">الانتقال السريع لسجل بالمعرف (ID):</label>
+        <input type="number" id="searchIdInput" placeholder="أدخل الرقم التعريفي...">
+        <button class="jump-btn" onclick="jumpToRecord()">انتقال مباشر 🔍</button>
+    </div>
+
+    <!-- السجلات والجدول الوطني -->
     <div class="card">
         <h3 style="margin-top: 0; color: var(--olive-dark);">السجلات الوطنية الشاملة</h3>
         <table>
@@ -71,13 +80,12 @@
     const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // دالة العودة لوحة الإدارة المركزية مباشرة
+    // دوال الرجوع الذكي
     function goToMasterDashboard() {
         sessionStorage.setItem('skipMasterLogin', 'true');
         window.location.href = 'admin-master.html';
     }
 
-    // دالة العودة لبوابة الإشراف العام (شاشة الدخول)
     function goToMasterLogin() {
         sessionStorage.removeItem('skipMasterLogin');
         sessionStorage.removeItem('userRole');
@@ -97,7 +105,7 @@
         }
 
         tbody.innerHTML = data.map(d => `
-            <tr>
+            <tr id="record-${d.id}">
                 <td><strong>#${d.id}</strong></td>
                 <td>${d.regions?.name_ar || '-'}</td>
                 <td>${d.provinces?.name_ar || '-'}</td>
@@ -106,6 +114,27 @@
                 <td>${d.license_status || '-'}</td>
             </tr>
         `).join('');
+    }
+
+    // دالة الانتقال المباشر وتحديد الصف باللون المميز عبر المعرف الرقمي (ID)
+    function jumpToRecord() {
+        const id = document.getElementById('searchIdInput').value.trim();
+        if (!id) {
+            alert('الرجاء إدخال الرقم التعريفي (ID) أولاً.');
+            return;
+        }
+
+        const targetRow = document.getElementById(`record-${id}`);
+        if (targetRow) {
+            // إزالة التحديد عن أي صف سابق
+            document.querySelectorAll('.highlight-row').forEach(r => r.classList.remove('highlight-row'));
+            
+            // تمرير الشاشة بمرونة نحو الصف المطلوب وتمييزه بلون خلفية مؤقت
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetRow.classList.add('highlight-row');
+        } else {
+            alert(`لم يتم العثور على أي سجل يحمل الرقم التعريفي: #${id}`);
+        }
     }
 
     fetchNationalData();
