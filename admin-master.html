@@ -178,6 +178,32 @@
             alert('تم تحديث رابط الواتساب الجهوي بنجاح من بوابة المشرف العام! 🟢');
         }
     }
+     // إعداد مؤقت الخمول التلقائي (مثلاً: 5 دقائق من عدم التفاعل)
+    let inactivityTimeout;
+    const idleLimitMinutes = 5; // يمكنك تعديل عدد الدقائق حسب رغبتك (مثلاً 3 أو 5 دقائق)
+
+    function resetIdleTimer() {
+        clearTimeout(inactivityTimeout);
+        // تحويل الدقائق إلى ملي ثانية (الدقيقة = 60000 ملي ثانية)
+        inactivityTimeout = setTimeout(logoutDueToInactivity, idleLimitMinutes * 60 * 1000);
+    }
+
+    function logoutDueToInactivity() {
+        alert('⚠️ تنبيه أمني: تم تسجيل الخروج تلقائياً بسبب عدم التفاعل لفترة طويلة حفاظاً على سرية المعطيات.');
+        sessionStorage.clear(); // مسح الجلسة بالكامل
+        window.location.href = 'login.html'; // أو الوجة الرئيسية portail.html
+    }
+
+    // الاستماع لأحداث حركة المستخدم (فأرة، كيبورد، لمس الشاشة)
+    window.addEventListener('mousemove', resetIdleTimer);
+    window.addEventListener('keypress', resetIdleTimer);
+    window.addEventListener('click', resetIdleTimer);
+    window.addEventListener('scroll', resetIdleTimer);
+    window.addEventListener('touchstart', resetIdleTimer);
+
+    // البدء بتشغيل المؤقت عند تحميل الصفحة
+    resetIdleTimer();
+   
 </script>
 </body>
     </html>
