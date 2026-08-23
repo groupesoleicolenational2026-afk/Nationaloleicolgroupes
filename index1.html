@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استمارة التحقق من الصفة المهنية - قطاع زيت الزيتون</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; background: #fff; margin: auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #1e3d59; margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+        
+        .legal-notice { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #059669; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 13.5px; line-height: 1.6; color: #475569; }
+        .legal-notice p { margin: 0 0 10px 0; }
+        .legal-notice p:last-child { margin-bottom: 0; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2b2d42; }
+        select, input[type="text"], button { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background-color: #fff; box-sizing: border-box; }
+        select:focus, input[type="text"]:focus { border-color: #3b82f6; outline: none; }
+        .checkbox-group { background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .checkbox-label { display: flex; align-items: center; font-weight: normal; margin-bottom: 8px; cursor: pointer; }
+        .checkbox-label input { margin-left: 10px; width: 18px; height: 18px; }
+        .declaration-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; display: flex; align-items: center; margin-bottom: 15px; }
+        button { background: #059669; color: white; border: none; cursor: pointer; margin-top: 15px; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #047857; }
+        #result-box { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; display: none; }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>استمارة التحقق من الصفة المهنية</h2>
+    <p class="subtitle">خاص بأرباب المعاصر ومسوقي زيت الزيتون للانضمام للمجموعات الجهوية</p>
+    
+    <div class="legal-notice">
+        <p><strong>الغرض من الاستمارة:</strong> تهدف هذه الاستمارة حصريًا إلى التحقق من الصفة المهنية لطالب الانضمام إلى مجموعة الواتساب لمهنيي إنتاج وتسويق زيت الزيتون، والتأكد من ارتباط الوحدة أو النشاط المصرح به فعليًا بالقطاع.</p>
+        <p>🔒 <strong>حماية البيانات:</strong> لا يُطلب في هذه الاستمارة رقم الهاتف، البريد الإلكتروني، رقم البطاقة الوطنية، أو أي معلومات شخصية غير ضرورية. تُستعمل المعلومات المقدمة من طرف مشرفي المجموعة فقط لغرض التحقق والبت في طلب الانضمام.</p>
+    </div>
+
+    <form id="verificationForm">
+        <div class="form-group">
+            <label for="region">الجهة الترابية:</label>
+            <select id="region" required>
+                <option value="">اختر الجهة...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="province">الإقليم / العمالة:</label>
+            <select id="province" disabled required>
+                <option value="">اختر الجهة أولاً...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="commune">الجماعة الترابية:</label>
+            <input type="text" id="commune" placeholder="أدخل اسم الجماعة أو المدشر أو الدوار..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="companyName">التسمية التجارية أو القانونية للوحدة:</label>
+            <input type="text" id="companyName" placeholder="أدخل اسم الشركة أو المعصرة أو النشاط..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="activityNature">طبيعة النشاط:</label>
+            <select id="activityNature" required>
+                <option value="">اختر طبيعة النشاط...</option>
+                <option value="طحن الزيتون">طحن الزيتون</option>
+                <option value="تسويق زيت الزيتون(لا أملك معصرة)">تسويق زيت الزيتون (لا أملك معصرة)</option>
+                <option value="الطحن و التسويق">الطحن و التسويق</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>نوع الوحدة (يمكن اختيار أكثر من عنصر):</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="عصرية"> عصرية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="شبه عصرية"> شبه عصرية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="تقليدية"> تقليدية</label>
+                <label class="checkbox-label"><input type="checkbox" name="unitType" value="خدمات التعبئة والتسويق"> خدمات التعبئة والتسويق</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="license">الوضع القانوني للترخيص الصحي (ONSSA):</label>
+            <select id="license" required>
+                <option value="">اختر الحالة القانونية...</option>
+                <option value="نعم">نعم</option>
+                <option value="في طور الإنجاز">في طور الإنجاز</option>
+                <option value="لا">لا</option>
+            </select>
+        </div>
+
+        <div class="form-group declaration-box">
+            <label class="checkbox-label" style="margin-bottom: 0; width: 100%;">
+                <input type="checkbox" id="declaration" required style="margin-left: 10px;">
+                أصرح بصدق وصحة المعلومات المصرح بها أعلاه تحت مسؤوليتي المهنية.
+            </label>
+        </div>
+
+        <!-- تم تعديل نص الزر إلى "إرسال" -->
+        <button type="submit">إرسال</button>
+    </form>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://jjexwbowhasmvwjvvkdk.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_3PZs80WVHFENf398x7KN2A_pesAX-Nm';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // دالة جلب الجهات من قاعدة البيانات
+    async function loadRegions() {
+        const regionSelect = document.getElementById('region');
+        
+        const { data: regions, error } = await supabaseClient
+            .from('regions')
+            .select('id, name_ar')
+            .order('id');
+
+        if (error) {
+            console.error('خطأ في جلب الجهات:', error);
+            return;
+        }
+
+        regions.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.id;
+            option.textContent = region.name_ar;
+            regionSelect.appendChild(option);
+        });
+    }
+
+    // دالة جلب الأقاليم بناءً على الجهة المختارة
+    document.getElementById('region').addEventListener('change', async function() {
+        const regionId = this.value;
+        const provinceSelect = document.getElementById('province');
+        
+        provinceSelect.innerHTML = '<option value="">اختر الإقليم / العمالة...</option>';
+        
+        if (!regionId) {
+            provinceSelect.disabled = true;
+            provinceSelect.innerHTML = '<option value="">اختر الجهة أولاً...</option>';
+            return;
+        }
+
+        const { data: provinces, error } = await supabaseClient
+            .from('provinces')
+            .select('*')
+            .eq('region_id', regionId);
+
+        if (error) {
+            console.error('خطأ في جلب الأقاليم:', error);
+            return;
+        }
+
+        provinceSelect.disabled = false;
+        provinces.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province.id;
+            option.textContent = province.name_ar;
+            provinceSelect.appendChild(option);
+        });
+    });
+
+    loadRegions();
+
+    const form = document.getElementById('verificationForm');
+    const resultBox = document.getElementById('result-box');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const regionId = document.getElementById('region').value;
+        const provinceId = document.getElementById('province').value;
+        const communeText = document.getElementById('commune').value.trim();
+        
+        const companyNameInput = document.getElementById('companyName').value.trim();
+        const activityNature = document.getElementById('activityNature').value;
+        const license = document.getElementById('license').value;
+        const declaration = document.getElementById('declaration').checked;
+        
+        const selectedUnits = Array.from(document.querySelectorAll('input[name="unitType"]:checked')).map(el => el.value);
+        
+        if (selectedUnits.length === 0) {
+            alert('الرجاء اختيار نوع وحدة واحد على الأقل.');
+            return;
+        }
+
+        // 🛑 التحقق من التكرار الدقيق بناءً على تطابق (الاسم التجاري + الإقليم + الجماعة)
+        const { data: duplicateCheck, error: checkError } = await supabaseClient
+            .from('submissions')
+            .select('id')
+            .eq('province_id', provinceId)
+            .ilike('commune', communeText)
+            .ilike('company_name', companyNameInput);
+
+        if (checkError) {
+            console.error('خطأ أثناء التحقق من التكرار:', checkError);
+        } else if (duplicateCheck && duplicateCheck.length > 0) {
+            // إذا وجد تطابق تام في نفس الإقليم ونفس الجماعة ونفس التسمية التجارية
+            form.style.display = 'none';
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `<div class="danger">
+                <h3>🔴 عذراً، تم رفض طلب الانضمام (طلب مكرر)</h3>
+                <p>توجد وحدة مسجلة مسبقاً بنفس التسمية التجارية (<strong>"${companyNameInput}"</strong>) داخل نفس الجماعة والإقليم. لا يمكن قبول طلبات انضمام مكررة لنفس الوحدة.</p>
+            </div>`;
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        
+        let finalResult = "قبول";
+        let messageHTML = "";
+
+        const isMarketingOnly = (activityNature === "تسويق زيت الزيتون(لا أملك معصرة)");
+
+        if (isMarketingOnly && license === "لا") {
+            finalResult = "تم رفض طلبك";
+            messageHTML = `<div class="danger">
+                <h3>🔴 عذراً، تم رفض طلبك</h3>
+                <p>تم رفض طلبك (لعدم الاستيفاء القانوني للترخيص الصحي).</p>
+            </div>`;
+        } else if (isMarketingOnly && license === "في طور الإنجاز") {
+            finalResult = "تم رفض طلبك مؤقتا";
+            messageHTML = `<div class="danger">
+                <h3>🔴 عذراً، تم رفض طلبك مؤقتا</h3>
+                <p>تم رفض طلبك مؤقتا (في انتظار تسوية وضعية الترخيص الصحي).</p>
+            </div>`;
+        } else {
+            finalResult = "قبول";
+            messageHTML = `<div class="success">
+                <h3>🟢 مبروك، تم إرسال طلبك بنجاح!</h3>
+                <p>تم تسجبل طلبك بنجاح في المنظومة، وسيتم مراجعته من طرف الإدارة المختصة.</p>
+            </div>`;
+        }
+
+        const { error } = await supabaseClient.from('submissions').insert([{
+            region_id: regionId,
+            province_id: provinceId,
+            commune: communeText,
+            company_name: companyNameInput,
+            activity_nature: activityNature,
+            unit_types: selectedUnits,
+            license_status: license,
+            declaration: declaration,
+            result: finalResult
+        }]);
+
+        if (error) {
+            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة.");
+            console.error(error);
+            return;
+        }
+
+        form.style.display = 'none';
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = messageHTML;
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    });
+</script>
+    
+</body>
+          </html>
+          
